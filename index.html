@@ -43,3 +43,114 @@ $('language').onchange=e=>{lang=e.target.value;try{localStorage.setItem('robuxLa
 async function loadRates(){if(loading)return;loading=true;status='loading';renderStatus();const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);try{const response=await fetch('https://open.er-api.com/v6/latest/USD',{signal:controller.signal});if(!response.ok)throw Error('HTTP');const data=await response.json();if(data.result!=='success'||!currencies.every(c=>Number.isFinite(data.rates?.[c])&&data.rates[c]>0))throw Error('Invalid rates');updated=data.time_last_update_unix;currencies.forEach(c=>{if(!manualEdits.has(c)){rates[c]=data.rates[c];$('rate'+c).value=rates[c]}});status=manualEdits.size?'manual':'loaded';try{localStorage.setItem('robuxRates',JSON.stringify({rates:data.rates,updated}))}catch(e){}}catch(e){status=manualEdits.size?'manual':updated?'cached':'error'}finally{clearTimeout(timer);loading=false;renderStatus();calculate()}}
 $('refresh').onclick=()=>{manualEdits.clear();loadRates()};buildPlus();render();loadRates();
 </script></body></html>
+<style>
+  .capital-clock {
+    max-width: 480px;
+    margin: 20px auto 0;
+    padding: 18px 16px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.20);
+  }
+
+  .capital-clock-label {
+    margin-bottom: 8px;
+    color: #98a2b3;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .capital-clock-time {
+    display: block;
+    color: #f2f4f7;
+    font-family: inherit;
+    font-size: clamp(18px, 5vw, 23px);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+</style>
+
+<footer class="capital-clock">
+  <div id="capitalClockLabel" class="capital-clock-label"></div>
+  <time id="capitalClockTime" class="capital-clock-time"></time>
+</footer>
+
+<script>
+(() => {
+  const cities = {
+    ru: {
+      zone: "Europe/Moscow",
+      label: "Москва · время столицы"
+    },
+    be: {
+      zone: "Europe/Minsk",
+      label: "Мінск · час сталіцы"
+    },
+    uk: {
+      zone: "Europe/Kyiv",
+      label: "Київ · час столиці"
+    },
+en: {
+  zone: "America/New_York",
+  label: "Washington, D.C. · capital time"
+}
+  };
+
+  const languageSelect = document.getElementById("lang");
+  const label = document.getElementById("capitalClockLabel");
+  const clock = document.getElementById("capitalClockTime");
+
+  let formatter;
+
+  function updateClock() {
+    const now = new Date();
+
+    const parts = Object.fromEntries(
+      formatter.formatToParts(now).map(part => [
+        part.type,
+        part.value
+      ])
+    );
+
+    clock.textContent =
+      `${parts.day}:${parts.month}:${parts.year} ` +
+      `${parts.hour}:${parts.minute}:${parts.second}`;
+
+    clock.dateTime = now.toISOString();
+  }
+
+  function changeClockLanguage() {
+    const language =
+      languageSelect?.value || document.documentElement.lang;
+
+    const city = cities[language] || cities.ru;
+
+    label.textContent = city.label;
+
+    formatter = new Intl.DateTimeFormat("en-GB", {
+      timeZone: city.zone,
+      numberingSystem: "latn",
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23"
+    });
+
+    updateClock();
+  }
+
+  languageSelect?.addEventListener("change", changeClockLanguage);
+
+  changeClockLanguage();
+  setInterval(updateClock, 1000);
+})();
+</script>

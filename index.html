@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
+<title>Robux Calculator — Dark Glass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0d10;
+  --card:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.10);
+  --text:#f2f4f7;
+  --muted:#98a2b3;
+  --accent:#7c9cff;
+  --accent2:#9d7cff;
+  --good:#4ade80;
+  --radius:24px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  min-height:100dvh;
+  font-family:Inter,system-ui,-apple-system,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(700px 500px at 15% 0%,rgba(124,156,255,.16),transparent 60%),
+    radial-gradient(650px 500px at 90% 10%,rgba(157,124,255,.14),transparent 60%),
+    linear-gradient(180deg,#0b0d10,#0e1116);
+  padding:22px 16px calc(40px + env(safe-area-inset-bottom));
+}
+.app{max-width:480px;margin:0 auto}
+
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.02em}
+.logo-dot{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px rgba(124,156,255,.25)}
+
+.glass{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  backdrop-filter:blur(22px) saturate(140%);
+  -webkit-backdrop-filter:blur(22px) saturate(140%);
+  box-shadow:0 20px 50px rgba(0,0,0,.32);
+}
+
+.card{padding:20px;margin-bottom:14px}
+.title{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:12px}
+
+.currency-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.currency-btn{
+  padding:12px 0;border-radius:16px;border:1px solid var(--border);
+  background:rgba(255,255,255,.04);color:var(--muted);
+  font:700 14px Inter,sans-serif;cursor:pointer;transition:.18s
+}
+.currency-btn.active{
+  color:#0b0d10;background:linear-gradient(135deg,#c8d4ff,#fff);
+  border-color:transparent;box-shadow:0 10px 24px rgba(160,180,255,.18)
+}
+
+.amount-wrap{position:relative}
+.amount-input{
+  width:100%;padding:18px 70px 18px 18px;border-radius:18px;
+  border:1px solid var(--border);background:rgba(255,255,255,.05);
+  color:var(--text);font:700 24px Inter,sans-serif;outline:none
+}
+.amount-input:focus{border-color:rgba(124,156,255,.55)}
+.amount-symbol{
+  position:absolute;right:18px;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-weight:700;font-size:18px
+}
+
+.result{
+  margin-top:14px;padding:16px;border-radius:18px;
+  background:rgba(124,156,255,.10);border:1px solid rgba(124,156,255,.22);
+  display:flex;justify-content:space-between;align-items:center
+}
+.result-label{color:#b8c7ff;font-size:12px;font-weight:600}
+.result-value{font-size:22px;font-weight:800;letter-spacing:-.02em}
+
+.pack{
+  display:flex;align-items:center;gap:14px;
+  padding:16px;margin-bottom:10px;border-radius:20px;
+  border:1px solid var(--border);background:var(--card);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  transition:.2s
+}
+.pack.disabled{opacity:.38;filter:grayscale(.5)}
+.pack.best{border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.07)}
+.pack-icon{
+  width:44px;height:44px;flex:0 0 auto;border-radius:14px;
+  display:grid;place-items:center;font-weight:800;
+  background:rgba(124,156,255,.13);color:#b8c7ff
+}
+.pack-info{flex:1}
+.pack-robux{font-weight:750;font-size:16px}
+.pack-price{color:var(--muted);font-size:12px;margin-top:2px}
+.pack-rate{color:var(--muted);font-size:11px;margin-top:2px}
+.badge{
+  padding:6px 10px;border-radius:999px;font-size:11px;font-weight:750;
+  background:rgba(74,222,128,.13);color:#a5f3c4;border:1px solid rgba(74,222,128,.22)
+}
+.badge.no{background:rgba(255,107,107,.10);color:#ffb4b4;border-color:rgba(255,107,107,.2)}
+
+.settings{margin-top:18px}
+.rate-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.rate-row label{font-size:13px;color:var(--muted);font-weight:600}
+.rate-input{
+  width:110px;padding:11px 12px;border-radius:14px;
+  border:1px solid var(--border);background:rgba(255,255,255,.05);
+  color:var(--text);font:600 14px Inter,sans-serif;outline:none;text-align:right
+}
+.note{color:var(--muted);font-size:11px;line-height:1.5;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="logo"><div class="logo-dot"></div>Robux Calc</div>
+    <div style="color:var(--muted);font-size:12px;font-weight:600">v1.1</div>
+  </header>
+
+  <section class="glass card">
+    <div class="title">Твоя сумма</div>
+
+    <div class="currency-row">
+      <button class="currency-btn active" data-currency="BYN">BYN</button>
+      <button class="currency-btn" data-currency="RUB">RUB</button>
+      <button class="currency-btn" data-currency="UAH">UAH</button>
+    </div>
+
+    <div class="amount-wrap">
+      <input id="amount" class="amount-input" type="number" min="0" step="0.01" placeholder="0" inputmode="decimal">
+      <span id="currencySymbol" class="amount-symbol">Br</span>
+    </div>
+
+    <div class="result">
+      <div>
+        <div class="result-label">В долларах</div>
+        <div class="result-value" id="usdResult">$0.00</div>
+      </div>
+      <div style="text-align:right">
+        <div class="result-label">Лучший пакет</div>
+        <div class="result-value" id="bestPack">—</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="glass card">
+    <div class="title">Доступные пакеты Robux</div>
+    <div id="packs"></div>
+
+    <div id="leftover" class="result" style="display:none">
+      <div>
+        <div class="result-label">Останется после покупки</div>
+        <div class="result-value" id="leftoverValue">$0.00</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="glass card settings">
+    <div class="title">Курсы к 1 USD</div>
+
+    <div class="rate-row">
+      <label>BYN → USD</label>
+      <input class="rate-input" id="rateBYN" type="number" step="0.0001" value="3.00">
+    </div>
+
+    <div class="rate-row">
+      <label>RUB → USD</label>
+      <input class="rate-input" id="rateRUB" type="number" step="0.0001" value="90.00">
+    </div>
+
+    <div class="rate-row">
+      <label>UAH → USD</label>
+      <input class="rate-input" id="rateUAH" type="number" step="0.0001" value="41.00">
+    </div>
+
+    <div id="apiStatus" class="note">Загружаю актуальные курсы…</div>
+  </section>
+
+</div>
+
+<script>
+const PACKS = [
+  { robux: 400, usd: 4.99 },
+  { robux: 800, usd: 9.99 },
+  { robux: 1700, usd: 19.99 },
+  { robux: 4500, usd: 49.99 },
+  { robux: 10000, usd: 99.99 },
+  { robux: 22500, usd: 199.99 }
+];
+
+const SYMBOLS = {
+  BYN: "Br",
+  RUB: "₽",
+  UAH: "₴"
+};
+
+const API_URL = "https://open.er-api.com/v6/latest/USD";
+
+let currency = "BYN";
+let selectedPack = null;
+
+const amountInput = document.getElementById("amount");
+const packsBox = document.getElementById("packs");
+const apiStatus = document.getElementById("apiStatus");
+
+document.querySelectorAll(".currency-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".currency-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    currency = btn.dataset.currency;
+    document.getElementById("currencySymbol").textContent = SYMBOLS[currency];
+
+    calculate();
+  });
+});
+
+["rateBYN", "rateRUB", "rateUAH"].forEach(id => {
+  document.getElementById(id).addEventListener("input", calculate);
+});
+
+amountInput.addEventListener("input", calculate);
+
+function getRate() {
+  const value = parseFloat(document.getElementById("rate" + currency).value);
+  return value > 0 ? value : 1;
+}
+
+async function loadRates() {
+  try {
+    const response = await fetch(API_URL);
+    const data = await response.json();
+
+    if (!data || !data.rates) {
+      throw new Error("Нет данных");
+    }
+
+    const rates = data.rates;
+
+    if (rates.BYN) {
+      document.getElementById("rateBYN").value = rates.BYN.toFixed(4);
+    }
+
+    if (rates.RUB) {
+      document.getElementById("rateRUB").value = rates.RUB.toFixed(4);
+    }
+
+    if (rates.UAH) {
+      document.getElementById("rateUAH").value = rates.UAH.toFixed(4);
+    }
+
+    const updated = new Date(data.time_last_update_utc);
+
+    apiStatus.textContent =
+      "Курсы обновлены автоматически: " +
+      updated.toLocaleString("ru-RU") +
+      ". Можно изменить вручную — расчёт обновится сразу.";
+
+    calculate();
+
+  } catch (error) {
+    apiStatus.textContent =
+      "Не удалось загрузить курсы автоматически. Используются ручные значения — введи свой курс при необходимости.";
+  }
+}
+
+function calculate() {
+  const localAmount = parseFloat(amountInput.value) || 0;
+  const usd = localAmount / getRate();
+
+  document.getElementById("usdResult").textContent = "$" + usd.toFixed(2);
+
+  packsBox.innerHTML = "";
+
+  const available = PACKS.filter(pack => usd >= pack.usd);
+
+  let best = null;
+
+  if (available.length) {
+    best = available.reduce((a, b) => {
+      return (b.robux / b.usd) > (a.robux / a.usd) ? b : a;
+    });
+  }
+
+  PACKS.forEach(pack => {
+    const canBuy = usd >= pack.usd;
+    const isBest = best && pack.robux === best.robux;
+    const robuxPerDollar = (pack.robux / pack.usd).toFixed(1);
+
+    const div = document.createElement("div");
+    div.className =
+      "pack" +
+      (canBuy ? "" : " disabled") +
+      (isBest ? " best" : "");
+
+    div.innerHTML = `
+      <div class="pack-icon">R$</div>
+      <div class="pack-info">
+        <div class="pack-robux">${pack.robux.toLocaleString("ru-RU")} Robux</div>
+        <div class="pack-price">$${pack.usd.toFixed(2)}</div>
+        <div class="pack-rate">${robuxPerDollar} Robux за $1</div>
+      </div>
+      <div class="badge ${canBuy ? "" : "no"}">
+        ${canBuy ? (isBest ? "Выгодно" : "Доступно") : "Мало"}
+      </div>
+    `;
+
+    if (canBuy) {
+      div.addEventListener("click", () => {
+        selectedPack = pack;
+        calculate();
+      });
+    }
+
+    packsBox.appendChild(div);
+  });
+
+  const bestPackEl = document.getElementById("bestPack");
+  const leftoverBox = document.getElementById("leftover");
+  const leftoverValue = document.getElementById("leftoverValue");
+
+  if (best) {
+    bestPackEl.textContent = best.robux.toLocaleString("ru-RU") + " R$";
+
+    if (!selectedPack || usd < selectedPack.usd) {
+      selectedPack = best;
+    }
+
+    leftoverBox.style.display = "flex";
+    leftoverValue.textContent = "$" + (usd - selectedPack.usd).toFixed(2);
+
+  } else {
+    bestPackEl.textContent = "—";
+    leftoverBox.style.display = "none";
+  }
+}
+
+loadRates();
+calculate();
+</script>
+</body>
+</html>

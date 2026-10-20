@@ -17,7 +17,6 @@
   --muted:#98a2b3;
   --accent:#7c9cff;
   --accent2:#9d7cff;
-  --good:#4ade80;
   --radius:24px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -33,9 +32,15 @@ body{
 }
 .app{max-width:480px;margin:0 auto}
 
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.02em}
 .logo-dot{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px rgba(124,156,255,.25)}
+
+.lang-select{
+  padding:10px 12px;border-radius:14px;border:1px solid var(--border);
+  background:rgba(255,255,255,.05);color:var(--text);
+  font:600 13px Inter,sans-serif;outline:none
+}
 
 .glass{
   background:var(--card);
@@ -48,6 +53,19 @@ body{
 
 .card{padding:20px;margin-bottom:14px}
 .title{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:12px}
+
+.segment{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px
+}
+.segment button{
+  padding:12px 0;border-radius:16px;border:1px solid var(--border);
+  background:rgba(255,255,255,.04);color:var(--muted);
+  font:700 13px Inter,sans-serif;cursor:pointer;transition:.18s
+}
+.segment button.active{
+  color:#0b0d10;background:linear-gradient(135deg,#c8d4ff,#fff);
+  border-color:transparent;box-shadow:0 10px 24px rgba(160,180,255,.18)
+}
 
 .currency-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .currency-btn{
@@ -120,17 +138,31 @@ body{
 
   <header class="header">
     <div class="logo"><div class="logo-dot"></div>Robux Calc</div>
-    <div style="color:var(--muted);font-size:12px;font-weight:600">v1.1</div>
+    <select id="lang" class="lang-select">
+      <option value="ru">Русский</option>
+      <option value="en">English</option>
+      <option value="uk">Українська</option>
+      <option value="be">Беларуская</option>
+    </select>
   </header>
 
   <section class="glass card">
-    <div class="title">Твоя сумма</div>
+    <div class="title" data-i18n="platform">Где покупаешь Robux</div>
+
+    <div class="segment">
+      <button id="modeApp" class="active" data-i18n="app">Приложение</button>
+      <button id="modeWeb" data-i18n="web">Сайт / ПК</button>
+    </div>
+
+    <div class="title" data-i18n="currency">Валюта</div>
 
     <div class="currency-row">
       <button class="currency-btn active" data-currency="BYN">BYN</button>
       <button class="currency-btn" data-currency="RUB">RUB</button>
       <button class="currency-btn" data-currency="UAH">UAH</button>
     </div>
+
+    <div class="title" data-i18n="amount">Твоя сумма</div>
 
     <div class="amount-wrap">
       <input id="amount" class="amount-input" type="number" min="0" step="0.01" placeholder="0" inputmode="decimal">
@@ -139,30 +171,30 @@ body{
 
     <div class="result">
       <div>
-        <div class="result-label">В долларах</div>
+        <div class="result-label" data-i18n="inUsd">В долларах</div>
         <div class="result-value" id="usdResult">$0.00</div>
       </div>
       <div style="text-align:right">
-        <div class="result-label">Лучший пакет</div>
+        <div class="result-label" data-i18n="bestPack">Лучший пакет</div>
         <div class="result-value" id="bestPack">—</div>
       </div>
     </div>
   </section>
 
   <section class="glass card">
-    <div class="title">Доступные пакеты Robux</div>
+    <div class="title" data-i18n="packs">Доступные пакеты Robux</div>
     <div id="packs"></div>
 
     <div id="leftover" class="result" style="display:none">
       <div>
-        <div class="result-label">Останется после покупки</div>
+        <div class="result-label" data-i18n="leftover">Останется после покупки</div>
         <div class="result-value" id="leftoverValue">$0.00</div>
       </div>
     </div>
   </section>
 
   <section class="glass card settings">
-    <div class="title">Курсы к 1 USD</div>
+    <div class="title" data-i18n="rates">Курсы к 1 USD</div>
 
     <div class="rate-row">
       <label>BYN → USD</label>
@@ -179,20 +211,114 @@ body{
       <input class="rate-input" id="rateUAH" type="number" step="0.0001" value="41.00">
     </div>
 
-    <div id="apiStatus" class="note">Загружаю актуальные курсы…</div>
+    <div id="apiStatus" class="note" data-i18n="loading">Загружаю актуальные курсы…</div>
   </section>
 
 </div>
 
 <script>
-const PACKS = [
-  { robux: 400, usd: 4.99 },
-  { robux: 800, usd: 9.99 },
-  { robux: 1700, usd: 19.99 },
-  { robux: 4500, usd: 49.99 },
-  { robux: 10000, usd: 99.99 },
-  { robux: 22500, usd: 199.99 }
-];
+const I18N = {
+  ru: {
+    platform: "Где покупаешь Robux",
+    app: "Приложение",
+    web: "Сайт / ПК",
+    currency: "Валюта",
+    amount: "Твоя сумма",
+    inUsd: "В долларах",
+    bestPack: "Лучший пакет",
+    packs: "Доступные пакеты Robux",
+    leftover: "Останется после покупки",
+    rates: "Курсы к 1 USD",
+    loading: "Загружаю актуальные курсы…",
+    updated: "Курсы обновлены автоматически:",
+    manual: "Можно изменить вручную — расчёт обновится сразу.",
+    apiError: "Не удалось загрузить курсы. Используются ручные значения.",
+    available: "Доступно",
+    best: "Выгодно",
+    low: "Мало",
+    perDollar: "Robux за $1"
+  },
+  en: {
+    platform: "Where you buy Robux",
+    app: "Mobile app",
+    web: "Website / PC",
+    currency: "Currency",
+    amount: "Your amount",
+    inUsd: "In USD",
+    bestPack: "Best pack",
+    packs: "Available Robux packs",
+    leftover: "Left after purchase",
+    rates: "Rates per 1 USD",
+    loading: "Loading live exchange rates…",
+    updated: "Rates updated automatically:",
+    manual: "You can edit them manually — the calculation updates instantly.",
+    apiError: "Could not load rates. Manual values are being used.",
+    available: "Available",
+    best: "Best value",
+    low: "Not enough",
+    perDollar: "Robux per $1"
+  },
+  uk: {
+    platform: "Де купуєш Robux",
+    app: "Застосунок",
+    web: "Сайт / ПК",
+    currency: "Валюта",
+    amount: "Твоя сума",
+    inUsd: "У доларах",
+    bestPack: "Найкращий пакет",
+    packs: "Доступні пакети Robux",
+    leftover: "Залишиться після покупки",
+    rates: "Курси до 1 USD",
+    loading: "Завантажую актуальні курси…",
+    updated: "Курси оновлено автоматично:",
+    manual: "Можна змінити вручну — розрахунок оновиться одразу.",
+    apiError: "Не вдалося завантажити курси. Використовуються ручні значення.",
+    available: "Доступно",
+    best: "Вигідно",
+    low: "Мало",
+    perDollar: "Robux за $1"
+  },
+  be: {
+    platform: "Дзе купляеш Robux",
+    app: "Дадатак",
+    web: "Сайт / ПК",
+    currency: "Валюта",
+    amount: "Твая сума",
+    inUsd: "У доларах",
+    bestPack: "Найлепшы пакет",
+    packs: "Даступныя пакеты Robux",
+    leftover: "Застанецца пасля куплі",
+    rates: "Курсы да 1 USD",
+    loading: "Загружаю актуальныя курсы…",
+    updated: "Курсы абноўлены аўтаматычна:",
+    manual: "Можна змяніць уручную — разлік абновіцца адразу.",
+    apiError: "Не ўдалося загрузіць курсы. Выкарыстоўваюцца ручныя значэнні.",
+    available: "Даступна",
+    best: "Выгодна",
+    low: "Мала",
+    perDollar: "Robux за $1"
+  }
+};
+
+const PACKS = {
+  app: [
+    { robux: 80, usd: 0.99 },
+    { robux: 400, usd: 4.99 },
+    { robux: 800, usd: 9.99 },
+    { robux: 1700, usd: 19.99 },
+    { robux: 4500, usd: 49.99 },
+    { robux: 10000, usd: 99.99 },
+    { robux: 22500, usd: 199.99 }
+  ],
+  web: [
+    { robux: 500, usd: 4.99 },
+    { robux: 1000, usd: 9.99 },
+    { robux: 2000, usd: 19.99 },
+    { robux: 5250, usd: 49.99 },
+    { robux: 11000, usd: 99.99 },
+    { robux: 24000, usd: 199.99 }
+  ]
+};
 
 const SYMBOLS = {
   BYN: "Br",
@@ -202,12 +328,51 @@ const SYMBOLS = {
 
 const API_URL = "https://open.er-api.com/v6/latest/USD";
 
+let lang = "ru";
+let mode = "app";
 let currency = "BYN";
 let selectedPack = null;
 
 const amountInput = document.getElementById("amount");
 const packsBox = document.getElementById("packs");
 const apiStatus = document.getElementById("apiStatus");
+
+function applyLanguage() {
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    if (I18N[lang][key]) {
+      el.textContent = I18N[lang][key];
+    }
+  });
+
+  document.getElementById("modeApp").textContent = I18N[lang].app;
+  document.getElementById("modeWeb").textContent = I18N[lang].web;
+
+  calculate();
+}
+
+document.getElementById("lang").addEventListener("change", event => {
+  lang = event.target.value;
+  applyLanguage();
+});
+
+document.getElementById("modeApp").addEventListener("click", () => {
+  mode = "app";
+  document.getElementById("modeApp").classList.add("active");
+  document.getElementById("modeWeb").classList.remove("active");
+  selectedPack = null;
+  calculate();
+});
+
+document.getElementById("modeWeb").addEventListener("click", () => {
+  mode = "web";
+  document.getElementById("modeWeb").classList.add("active");
+  document.getElementById("modeApp").classList.remove("active");
+  selectedPack = null;
+  calculate();
+});
 
 document.querySelectorAll(".currency-btn").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -238,7 +403,7 @@ async function loadRates() {
     const data = await response.json();
 
     if (!data || !data.rates) {
-      throw new Error("Нет данных");
+      throw new Error("No rates");
     }
 
     const rates = data.rates;
@@ -258,15 +423,14 @@ async function loadRates() {
     const updated = new Date(data.time_last_update_utc);
 
     apiStatus.textContent =
-      "Курсы обновлены автоматически: " +
-      updated.toLocaleString("ru-RU") +
-      ". Можно изменить вручную — расчёт обновится сразу.";
+      I18N[lang].updated + " " +
+      updated.toLocaleString(lang) + ". " +
+      I18N[lang].manual;
 
     calculate();
 
   } catch (error) {
-    apiStatus.textContent =
-      "Не удалось загрузить курсы автоматически. Используются ручные значения — введи свой курс при необходимости.";
+    apiStatus.textContent = I18N[lang].apiError;
   }
 }
 
@@ -278,7 +442,8 @@ function calculate() {
 
   packsBox.innerHTML = "";
 
-  const available = PACKS.filter(pack => usd >= pack.usd);
+  const currentPacks = PACKS[mode];
+  const available = currentPacks.filter(pack => usd >= pack.usd);
 
   let best = null;
 
@@ -288,7 +453,7 @@ function calculate() {
     });
   }
 
-  PACKS.forEach(pack => {
+  currentPacks.forEach(pack => {
     const canBuy = usd >= pack.usd;
     const isBest = best && pack.robux === best.robux;
     const robuxPerDollar = (pack.robux / pack.usd).toFixed(1);
@@ -302,12 +467,12 @@ function calculate() {
     div.innerHTML = `
       <div class="pack-icon">R$</div>
       <div class="pack-info">
-        <div class="pack-robux">${pack.robux.toLocaleString("ru-RU")} Robux</div>
+        <div class="pack-robux">${pack.robux.toLocaleString(lang)} Robux</div>
         <div class="pack-price">$${pack.usd.toFixed(2)}</div>
-        <div class="pack-rate">${robuxPerDollar} Robux за $1</div>
+        <div class="pack-rate">${robuxPerDollar} ${I18N[lang].perDollar}</div>
       </div>
       <div class="badge ${canBuy ? "" : "no"}">
-        ${canBuy ? (isBest ? "Выгодно" : "Доступно") : "Мало"}
+        ${canBuy ? (isBest ? I18N[lang].best : I18N[lang].available) : I18N[lang].low}
       </div>
     `;
 
@@ -326,7 +491,7 @@ function calculate() {
   const leftoverValue = document.getElementById("leftoverValue");
 
   if (best) {
-    bestPackEl.textContent = best.robux.toLocaleString("ru-RU") + " R$";
+    bestPackEl.textContent = best.robux.toLocaleString(lang) + " R$";
 
     if (!selectedPack || usd < selectedPack.usd) {
       selectedPack = best;
@@ -341,8 +506,9 @@ function calculate() {
   }
 }
 
+document.getElementById("lang").value = lang;
+applyLanguage();
 loadRates();
-calculate();
 </script>
 </body>
 </html>

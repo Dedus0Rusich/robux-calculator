@@ -44,67 +44,143 @@ async function loadRates(){if(loading)return;loading=true;status='loading';rende
 $('refresh').onclick=()=>{manualEdits.clear();loadRates()};buildPlus();render();loadRates();
 </script></body></html>
 <style>
-  .capital-clock {
-    max-width: 480px;
-    margin: 20px auto 0;
-    padding: 18px 16px;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.20);
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
   }
 
-  .capital-clock-label {
-    margin-bottom: 8px;
-    color: #98a2b3;
+  .header .logo {
+    flex-shrink: 0;
+    font-size: 14px;
+    gap: 7px;
+  }
+
+  .header .logo-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+  }
+
+  .header .lang-select {
+    flex-shrink: 0;
+    min-width: 0;
+    max-width: 110px;
+    padding: 11px 7px;
     font-size: 12px;
+    color-scheme: dark;
+  }
+
+  .header-clock {
+    flex: 1;
+    min-width: 0;
+    padding: 9px 7px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .header-clock-city {
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #98a2b3;
+    font-size: 10px;
     font-weight: 600;
   }
 
-  .capital-clock-time {
+  .header-clock-time {
     display: block;
+    white-space: nowrap;
     color: #f2f4f7;
-    font-family: inherit;
-    font-size: clamp(18px, 5vw, 23px);
+    font-size: 11px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.03em;
-    white-space: nowrap;
+  }
+
+  @media (max-width: 390px) {
+    .header {
+      flex-wrap: wrap;
+    }
+
+    .header .logo {
+      flex: 1;
+    }
+
+    .header-clock {
+      flex: 0 0 100%;
+      order: 3;
+      margin-top: 3px;
+    }
+
+    .header-clock-time {
+      font-size: 14px;
+    }
   }
 </style>
 
-<footer class="capital-clock">
-  <div id="capitalClockLabel" class="capital-clock-label"></div>
-  <time id="capitalClockTime" class="capital-clock-time"></time>
-</footer>
-
 <script>
 (() => {
+  const STORAGE_KEY = "robux-calculator-language";
+
   const cities = {
     ru: {
       zone: "Europe/Moscow",
-      label: "Москва · время столицы"
+      name: "Москва"
     },
     be: {
       zone: "Europe/Minsk",
-      label: "Мінск · час сталіцы"
+      name: "Мінск"
     },
     uk: {
       zone: "Europe/Kyiv",
-      label: "Київ · час столиці"
+      name: "Київ"
     },
-en: {
-  zone: "America/New_York",
-  label: "Washington, D.C. · capital time"
-}
+    en: {
+      zone: "America/New_York",
+      name: "Washington, D.C."
+    }
   };
 
   const languageSelect = document.getElementById("lang");
-  const label = document.getElementById("capitalClockLabel");
-  const clock = document.getElementById("capitalClockTime");
+  const header = document.querySelector(".header");
+
+  if (!languageSelect || !header) return;
+
+  // Восстанавливаем язык после перезагрузки.
+  let savedLanguage = null;
+
+  try {
+    savedLanguage = localStorage.getItem(STORAGE_KEY);
+  } catch (error) {
+    // Калькулятор продолжит работать без сохранения.
+  }
+
+  if (savedLanguage && cities[savedLanguage]) {
+    languageSelect.value = savedLanguage;
+
+    // Запускаем существующий перевод калькулятора.
+    languageSelect.dispatchEvent(
+      new Event("change", { bubbles: true })
+    );
+  }
+
+  const clockBox = document.createElement("div");
+  clockBox.className = "header-clock";
+
+  const cityLabel = document.createElement("div");
+  cityLabel.className = "header-clock-city";
+
+  const timeLabel = document.createElement("time");
+  timeLabel.className = "header-clock-time";
+
+  clockBox.append(cityLabel, timeLabel);
+  header.insertBefore(clockBox, languageSelect);
 
   let formatter;
 
@@ -118,20 +194,17 @@ en: {
       ])
     );
 
-    clock.textContent =
+    timeLabel.textContent =
       `${parts.day}:${parts.month}:${parts.year} ` +
       `${parts.hour}:${parts.minute}:${parts.second}`;
 
-    clock.dateTime = now.toISOString();
+    timeLabel.dateTime = now.toISOString();
   }
 
-  function changeClockLanguage() {
-    const language =
-      languageSelect?.value || document.documentElement.lang;
+  function configureClock() {
+    const city = cities[languageSelect.value] || cities.ru;
 
-    const city = cities[language] || cities.ru;
-
-    label.textContent = city.label;
+    cityLabel.textContent = city.name;
 
     formatter = new Intl.DateTimeFormat("en-GB", {
       timeZone: city.zone,
@@ -148,9 +221,28 @@ en: {
     updateClock();
   }
 
-  languageSelect?.addEventListener("change", changeClockLanguage);
+  languageSelect.addEventListener("change", () => {
+    // Обновляем часы сразу, даже если сохранение недоступно.
+    configureClock();
 
-  changeClockLanguage();
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        languageSelect.value
+      );
+    } catch (error) {
+      // Не перезагружаем страницу, если язык нельзя сохранить.
+      return;
+    }
+
+    window.location.reload();
+  });
+
+  configureClock();
   setInterval(updateClock, 1000);
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) updateClock();
+  });
 })();
 </script>

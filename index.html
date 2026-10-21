@@ -964,19 +964,52 @@ option {
     return num(value) + " " + currency;
   }
 
-  function parseDecimal(text, emptyAsZero = false) {
-    const clean = String(text)
-      .trim()
-      .replace(/[s  ]/g, "")
-      .replace(",", ".");
+function parseDecimal(text, emptyAsZero = false) {
+  let clean = String(text).trim();
 
-    if (!clean) return emptyAsZero ? 0 : NaN;
+  // Убираем пробелы, включая неразрывные.
+  clean = clean
+    .split(" ").join("")
+    .split(String.fromCharCode(160)).join("")
+    .split(String.fromCharCode(8239)).join("");
 
-    if (!/^(?:d+(?:.d*)?|.d+)$/.test(clean)) return NaN;
-
-    const value = Number(clean);
-    return Number.isFinite(value) ? value : NaN;
+  // Пустая сумма считается нулём, пустой курс — ошибкой.
+  if (clean === "") {
+    return emptyAsZero ? 0 : NaN;
   }
+
+  // Принимаем и запятую, и точку.
+  clean = clean.split(",").join(".");
+
+  let decimalPoints = 0;
+  let digits = 0;
+
+  for (const character of clean) {
+    if (character === ".") {
+      decimalPoints++;
+
+      if (decimalPoints > 1) {
+        return NaN;
+      }
+
+      continue;
+    }
+
+    if (character < "0" || character > "9") {
+      return NaN;
+    }
+
+    digits++;
+  }
+
+  if (digits === 0) {
+    return NaN;
+  }
+
+  const value = Number(clean);
+
+  return Number.isFinite(value) ? value : NaN;
+}
 
   function save() {
     const manualRates = {};

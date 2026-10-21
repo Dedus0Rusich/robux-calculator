@@ -2,20 +2,47 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0b0d10">
-<title>Robux Calc</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<title>RBXWell — Robux Calculator</title>
 
 <style>
 :root {
   color-scheme: dark;
-  --bg: #0b0d10;
-  --card: rgba(255,255,255,.055);
+  --bg: #0b0d12;
+  --surface: rgba(24, 29, 40, .86);
+  --soft: rgba(255,255,255,.045);
   --border: rgba(255,255,255,.10);
-  --text: #f2f4f7;
-  --muted: #a1a9b8;
+  --text: #f2f4fa;
+  --muted: #a2acbd;
   --accent: #b9caff;
-  --green: #a5f3c4;
+  --accent-bg: rgba(124,156,255,.10);
+  --green: #a7edc4;
+  --green-bg: rgba(74,222,128,.07);
+  --glow:
+    radial-gradient(650px 420px at 0% 0%, #7699ff20, transparent 65%),
+    radial-gradient(600px 420px at 100% 10%, #a979ff16, transparent 65%);
+}
+
+html[data-theme="amoled"] {
+  --bg: #000;
+  --surface: #000;
+  --soft: #080808;
+  --border: #252525;
+  --accent: #e5e5e5;
+  --accent-bg: #101010;
+  --glow: none;
+}
+
+html[data-theme="oled"] {
+  --bg: #000;
+  --surface: rgba(10,10,16,.95);
+  --soft: #0d0d16;
+  --border: #27243b;
+  --accent: #ccbaff;
+  --accent-bg: rgba(165,125,255,.10);
+  --glow:
+    radial-gradient(550px 350px at 100% 0%, #8850ff19, transparent 65%);
 }
 
 * {
@@ -27,12 +54,9 @@ body {
   margin: 0;
   min-height: 100dvh;
   padding: 20px 14px calc(30px + env(safe-area-inset-bottom));
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(650px 450px at 0% 0%, #7c9cff20, transparent 65%),
-    radial-gradient(600px 450px at 100% 15%, #9d7cff18, transparent 65%),
-    var(--bg);
+  background: var(--glow), var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 button, input, select {
@@ -43,8 +67,8 @@ button, select {
   cursor: pointer;
 }
 
-button, input, select, a {
-  -webkit-tap-highlight-color: transparent;
+button, input, select {
+  color: var(--text);
 }
 
 :focus-visible {
@@ -52,8 +76,16 @@ button, input, select, a {
   outline-offset: 3px;
 }
 
+button:disabled {
+  cursor: default;
+}
+
+[hidden] {
+  display: none !important;
+}
+
 .app {
-  max-width: 540px;
+  max-width: 570px;
   margin: auto;
 }
 
@@ -61,48 +93,48 @@ button, input, select, a {
   display: flex;
   align-items: center;
   gap: 9px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
-.logo {
+.brand {
   display: flex;
   align-items: center;
   gap: 7px;
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
-  letter-spacing: -.4px;
+  letter-spacing: -.5px;
 }
 
-.logo-icon {
-  width: 27px;
-  height: 27px;
+.brand-icon {
   display: grid;
   place-items: center;
-  border-radius: 9px;
-  color: #10131a;
-  background: linear-gradient(135deg, #c7d5ff, #a58aff);
+  width: 29px;
+  height: 29px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #101016;
+  font-size: 12px;
+  letter-spacing: 0;
 }
 
 .clock {
   flex: 1;
   min-width: 0;
-  padding: 9px 6px;
-  text-align: center;
-  border-radius: 16px;
+  padding: 9px 5px;
   border: 1px solid var(--border);
-  background: var(--card);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  border-radius: 16px;
+  background: var(--surface);
+  text-align: center;
 }
 
 .clock-city {
   margin-bottom: 4px;
-  font-size: 10px;
-  color: var(--muted);
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 10px;
 }
 
 .clock-time {
@@ -114,14 +146,17 @@ button, input, select, a {
 }
 
 .language {
-  width: 104px;
-  flex-shrink: 0;
+  width: 105px;
   padding: 12px 6px;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: #191d25;
-  color: var(--text);
+  background: var(--surface);
   font-size: 12px;
+}
+
+option {
+  background: #15151c;
+  color: #fff;
 }
 
 .card {
@@ -129,54 +164,69 @@ button, input, select, a {
   padding: 20px;
   border: 1px solid var(--border);
   border-radius: 25px;
-  background: var(--card);
+  background: var(--surface);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
-  box-shadow: 0 18px 45px #00000026;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .title {
   margin: 0 0 13px;
+  color: var(--muted);
   font-size: 14px;
   font-weight: 650;
-  color: var(--muted);
 }
 
-.currencies {
+.section-heading .title {
+  margin: 0;
+}
+
+.segment {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
-  margin-bottom: 18px;
 }
 
-.currency {
-  min-height: 45px;
+.segment button {
+  min-height: 44px;
+  padding: 9px 5px;
   border: 1px solid var(--border);
-  border-radius: 15px;
-  background: #ffffff05;
+  border-radius: 14px;
+  background: var(--soft);
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 }
 
-.currency.active {
-  color: #11141b;
-  background: linear-gradient(135deg, #c8d4ff, #ffffff);
-  border-color: transparent;
+.segment button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #11131b;
 }
 
-.amount-box {
+.amount-label {
+  display: block;
+  margin-top: 19px;
+}
+
+.amount-wrap {
   position: relative;
 }
 
 .amount {
   width: 100%;
-  padding: 17px 65px 17px 16px;
+  padding: 17px 70px 17px 16px;
   border: 1px solid var(--border);
   border-radius: 17px;
-  background: #ffffff06;
-  color: var(--text);
-  font-size: 27px;
+  background: var(--soft);
+  font-size: 28px;
   font-weight: 700;
 }
 
@@ -189,18 +239,38 @@ button, input, select, a {
   font-weight: 700;
 }
 
+.action {
+  min-height: 40px;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.action:disabled {
+  opacity: .5;
+}
+
+.calculate {
+  width: 100%;
+  margin-top: 11px;
+}
+
 .summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
   margin-top: 14px;
 }
 
-.summary-item, .purchase {
+.summary-box, .purchase {
   padding: 15px;
+  border: 1px solid var(--border);
   border-radius: 17px;
-  background: #7c9cff10;
-  border: 1px solid #7c9cff26;
+  background: var(--accent-bg);
 }
 
 .label {
@@ -212,10 +282,10 @@ button, input, select, a {
 }
 
 .value {
-  font-size: 21px;
+  font-size: 23px;
   font-weight: 800;
-  overflow-wrap: anywhere;
   font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
 
 .note {
@@ -231,44 +301,41 @@ button, input, select, a {
 }
 
 .pack {
-  width: 100%;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
+  width: 100%;
   padding: 14px 12px;
   text-align: left;
-  color: var(--text);
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #ffffff04;
-  transition: border-color .15s, background .15s;
+  background: var(--soft);
 }
 
 .pack:disabled {
-  cursor: default;
   opacity: .55;
 }
 
 .pack.best {
-  border-color: #4ade8055;
-  background: #4ade8009;
+  border-color: #69bc8b;
+  background: var(--green-bg);
 }
 
 .pack.selected {
-  border-color: #b9caff;
-  background: #7c9cff16;
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 
 .pack-icon {
-  width: 35px;
-  height: 35px;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
-  flex-shrink: 0;
+  width: 35px;
+  height: 35px;
   border-radius: 11px;
-  background: #7c9cff18;
+  background: var(--accent-bg);
   color: var(--accent);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -286,27 +353,27 @@ button, input, select, a {
   margin-top: 4px;
   color: var(--muted);
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .badge {
-  max-width: 94px;
+  max-width: 100px;
   padding: 6px 8px;
   border-radius: 12px;
+  background: var(--green-bg);
   color: var(--green);
-  background: #4ade8010;
-  font-size: 10px;
-  line-height: 1.4;
   text-align: center;
+  font-size: 10px;
+  line-height: 1.5;
 }
 
 .pack:disabled .badge {
-  color: #c6cbd5;
-  background: #ffffff08;
+  background: var(--soft);
+  color: var(--muted);
 }
 
 .purchase {
-  margin-top: 16px;
+  margin-top: 15px;
 }
 
 .purchase h3 {
@@ -318,7 +385,7 @@ button, input, select, a {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 11px;
+  margin-top: 10px;
   font-size: 13px;
 }
 
@@ -328,51 +395,85 @@ button, input, select, a {
 
 .purchase-row strong {
   text-align: right;
-  font-weight: 700;
 }
 
-.remainder {
-  margin-top: 15px;
+.remaining {
+  margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--border);
 }
 
-.remainder .value {
+.remaining .value {
   color: var(--green);
 }
 
-.rates-header {
+.arrows {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 6px;
 }
 
-.rates-header .title {
-  margin: 0;
-}
-
-.refresh {
-  min-height: 36px;
-  padding: 7px 11px;
+.arrow {
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #ffffff06;
-  color: var(--accent);
-  font-size: 12px;
+  background: var(--soft);
+  font-size: 18px;
 }
 
-.refresh:disabled {
-  opacity: .5;
-  cursor: wait;
+.plus-track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 3px 2px 14px;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.plus-card {
+  flex: 0 0 84%;
+  min-width: 0;
+  padding: 20px;
+  scroll-snap-align: start;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--soft);
+}
+
+.plus-card.selected {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.plus-card h3 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.plus-price {
+  color: var(--accent);
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.plus-card .action {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.plus-robux {
+  margin-top: 18px;
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .rate-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   margin-top: 10px;
 }
 
@@ -386,17 +487,16 @@ button, input, select, a {
   padding: 11px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #ffffff06;
-  color: var(--text);
+  background: var(--soft);
   text-align: right;
-  font-size: 15px;
 }
 
 .source {
-  display: block;
+  display: inline-block;
   margin-top: 12px;
   color: var(--accent);
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1.5;
   text-decoration: none;
 }
 
@@ -405,22 +505,18 @@ button, input, select, a {
   text-align: center;
 }
 
-[hidden] {
-  display: none !important;
-}
-
-@media (max-width: 380px) {
+@media (max-width: 390px) {
   .header {
     flex-wrap: wrap;
   }
 
-  .logo {
+  .brand {
     flex: 1;
   }
 
   .clock {
-    flex: 0 0 100%;
     order: 3;
+    flex: 0 0 100%;
   }
 
   .clock-time {
@@ -432,22 +528,21 @@ button, input, select, a {
   }
 
   .value {
-    font-size: 18px;
-  }
-
-  .pack {
-    gap: 8px;
-    padding: 12px 9px;
+    font-size: 19px;
   }
 
   .pack-icon {
     display: none;
   }
+
+  .plus-card {
+    flex-basis: 93%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   * {
-    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }
 </style>
@@ -457,14 +552,14 @@ button, input, select, a {
 <main class="app">
 
   <header class="header">
-    <div class="logo">
-      <span class="logo-icon" aria-hidden="true">R$</span>
-      Robux Calc
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">R$</span>
+      RBXWell
     </div>
 
     <div class="clock">
       <div id="clockCity" class="clock-city"></div>
-      <time id="clockTime" class="clock-time"></time>
+      <time id="clockTime" class="clock-time">—</time>
     </div>
 
     <select id="language" class="language" aria-label="Language">
@@ -476,18 +571,26 @@ button, input, select, a {
   </header>
 
   <section class="card">
+    <h2 class="title" data-t="theme"></h2>
+    <div class="segment" id="themes">
+      <button type="button" data-theme="glass">Glass</button>
+      <button type="button" data-theme="amoled">AMOLED</button>
+      <button type="button" data-theme="oled">OLED</button>
+    </div>
+  </section>
+
+  <section class="card">
     <h2 class="title" data-t="currency"></h2>
 
-    <div class="currencies">
-      <button type="button" class="currency" data-currency="BYN">BYN</button>
-      <button type="button" class="currency" data-currency="RUB">RUB</button>
-      <button type="button" class="currency" data-currency="UAH">UAH</button>
+    <div class="segment" id="currencies">
+      <button type="button" data-currency="BYN">BYN</button>
+      <button type="button" data-currency="RUB">RUB</button>
+      <button type="button" data-currency="UAH">UAH</button>
     </div>
 
-    <label class="title" for="amount" data-t="amount"
-      style="display:block"></label>
+    <label for="amount" class="title amount-label" data-t="amount"></label>
 
-    <div class="amount-box">
+    <div class="amount-wrap">
       <input
         id="amount"
         class="amount"
@@ -499,71 +602,74 @@ button, input, select, a {
       <span id="symbol" class="symbol"></span>
     </div>
 
+    <button id="calculate" type="button"
+      class="action calculate" data-t="calculate"></button>
+
     <div class="summary">
-      <div class="summary-item">
+      <div class="summary-box">
         <span class="label" data-t="usd"></span>
         <div id="usdValue" class="value">—</div>
       </div>
 
-      <div class="summary-item">
+      <div class="summary-box">
         <span class="label" data-t="best"></span>
         <div id="bestValue" class="value">—</div>
       </div>
     </div>
 
-    <p class="note" data-t="bestHint"></p>
     <p id="inputStatus" class="note" role="status"></p>
+    <p class="note" data-t="bestHint"></p>
   </section>
 
   <section class="card">
     <h2 class="title" data-t="packs"></h2>
     <p class="note" data-t="selectHint" style="margin:0 0 14px"></p>
-
     <div id="packs" class="packs"></div>
-
-    <section id="purchase" class="purchase" hidden>
-      <h3 data-t="selected"></h3>
-
-      <div class="purchase-row">
-        <span>Robux</span>
-        <strong id="selectedRobux"></strong>
-      </div>
-
-      <div class="purchase-row">
-        <span data-t="cost"></span>
-        <strong id="selectedCost"></strong>
-      </div>
-
-      <div class="remainder">
-        <span class="label" data-t="left"></span>
-        <div id="leftLocal" class="value"></div>
-        <div id="leftUsd" class="note"></div>
-      </div>
-    </section>
+    <section id="packPurchase" class="purchase" hidden></section>
   </section>
 
   <section class="card">
-    <div class="rates-header">
+    <div class="section-heading">
+      <h2 class="title">Roblox Plus</h2>
+
+      <div class="arrows">
+        <button id="plusPrevious" class="arrow" type="button"
+          aria-label="Previous">‹</button>
+        <button id="plusNext" class="arrow" type="button"
+          aria-label="Next">›</button>
+      </div>
+    </div>
+
+    <p class="note" data-t="swipe" style="margin:0 0 14px"></p>
+    <div id="plusTrack" class="plus-track"></div>
+
+    <p class="note" data-t="subscription"></p>
+    <section id="plusPurchase" class="purchase" hidden></section>
+  </section>
+
+  <section class="card">
+    <div class="section-heading">
       <h2 class="title" data-t="rates"></h2>
-      <button id="refresh" type="button" class="refresh" data-t="refresh"></button>
+      <button id="refresh" class="action" type="button"
+        data-t="refresh"></button>
     </div>
 
     <div class="rate-row">
       <label for="rateBYN">1 USD = BYN</label>
       <input id="rateBYN" class="rate-input"
-        type="number" min="0.000001" step="any" placeholder="—">
+        type="text" inputmode="decimal" placeholder="—">
     </div>
 
     <div class="rate-row">
       <label for="rateRUB">1 USD = RUB</label>
       <input id="rateRUB" class="rate-input"
-        type="number" min="0.000001" step="any" placeholder="—">
+        type="text" inputmode="decimal" placeholder="—">
     </div>
 
     <div class="rate-row">
       <label for="rateUAH">1 USD = UAH</label>
       <input id="rateUAH" class="rate-input"
-        type="number" min="0.000001" step="any" placeholder="—">
+        type="text" inputmode="decimal" placeholder="—">
     </div>
 
     <p id="apiStatus" class="note" role="status"></p>
@@ -572,651 +678,865 @@ button, input, select, a {
     <a class="source"
        href="https://www.exchangerate-api.com"
        target="_blank"
-       rel="noopener noreferrer">
-      Rates By ExchangeRate-API
-    </a>
+       rel="noopener noreferrer">Rates By ExchangeRate-API</a>
   </section>
 
   <footer class="footer">
-    <p class="note" data-t="disclaimer"></p>
+    <p class="note" data-t="footer"></p>
     <a class="source"
        href="https://www.roblox.com/upgrades/robux"
        target="_blank"
        rel="noopener noreferrer"
-       data-t="openRoblox"></a>
+       data-t="official"></a>
   </footer>
 
 </main>
 
 <script>
-"use strict";
+(function () {
+  "use strict";
 
-const PACKS = [
-  { robux: 40, cents: 49 },
-  { robux: 80, cents: 99 },
-  { robux: 400, cents: 499 },
-  { robux: 800, cents: 999 },
-  { robux: 1200, cents: 1499 },
-  { robux: 1700, cents: 1999 },
-  { robux: 3150, cents: 3499 },
-  { robux: 4500, cents: 4999 },
-  { robux: 10000, cents: 9999 },
-  { robux: 22500, cents: 19999 }
-];
+  const PACKS = [
+    { id: "r40", robux: 40, cents: 49 },
+    { id: "r80", robux: 80, cents: 99 },
+    { id: "r400", robux: 400, cents: 499 },
+    { id: "r800", robux: 800, cents: 999 },
+    { id: "r1200", robux: 1200, cents: 1499 },
+    { id: "r1700", robux: 1700, cents: 1999 },
+    { id: "r3150", robux: 3150, cents: 3499 },
+    { id: "r4500", robux: 4500, cents: 4999 },
+    { id: "r10000", robux: 10000, cents: 9999 },
+    { id: "r22500", robux: 22500, cents: 19999 }
+  ];
 
-const TRANSLATIONS = {
-  ru: {
-    currency: "Валюта",
-    amount: "Твоя сумма",
-    usd: "Бюджет в долларах",
-    best: "Выгодный пакет",
-    packs: "Пакеты Robux",
-    selectHint: "Нажми на доступный пакет, чтобы увидеть остаток.",
-    bestHint: "Рекомендация — один доступный пакет с наибольшим количеством Robux за $1. Комбинации нескольких покупок не рассчитываются.",
-    selected: "Выбранная покупка",
-    cost: "Стоимость",
-    left: "Останется после покупки",
-    rates: "Курсы к 1 USD",
-    refresh: "Обновить",
-    loading: "Загружаем курсы…",
-    updated: "Курсы источника на",
-    cached: "Сохранённые курсы на",
-    manual: "Используется введённый вручную курс.",
-    error: "Не удалось обновить курсы.",
-    noRates: "Введи курс вручную или нажми «Обновить».",
-    rateHint: "Можно ввести курс своего банка вручную. При обновлении он заменится курсом API.",
-    invalidAmount: "Введи корректную сумму не меньше нуля.",
-    invalidRate: "Для расчёта нужен курс выбранной валюты больше нуля.",
-    insufficient: "Пока не хватает на минимальный пакет.",
-    available: "Доступно",
-    value: "Выгодно",
-    chosen: "Выбрано",
-    unavailable: "Не хватает",
-    perDollar: "Robux за $1",
-    disclaimer: "Неофициальный калькулятор. Пакеты заданы по предоставленному скриншоту, а не загружаются с Roblox. Итоговые цены, доступность и банковский курс могут отличаться. Расчёт не учитывает комиссии и налоги.",
-    openRoblox: "Открыть официальный сайт Roblox"
-  },
+  const PLUS = [
+    { id: "plus", name: "Roblox Plus", cents: 499, robux: 0 },
+    { id: "plus500", name: "Plus 500", cents: 899, robux: 500 },
+    { id: "plus1000", name: "Plus 1000", cents: 1299, robux: 1000 },
+    { id: "plus2000", name: "Plus 2000", cents: 2199, robux: 2000 }
+  ];
 
-  en: {
-    currency: "Currency",
-    amount: "Your budget",
-    usd: "Budget in USD",
-    best: "Best-value pack",
-    packs: "Robux packs",
-    selectHint: "Select an affordable pack to see your remaining balance.",
-    bestHint: "The recommendation is one affordable pack with the most Robux per $1. Multiple-purchase combinations are not calculated.",
-    selected: "Selected purchase",
-    cost: "Cost",
-    left: "Remaining balance",
-    rates: "Exchange rates per 1 USD",
-    refresh: "Refresh",
-    loading: "Loading exchange rates…",
-    updated: "Source rates as of",
-    cached: "Saved rates as of",
-    manual: "A manually entered exchange rate is being used.",
-    error: "Could not refresh exchange rates.",
-    noRates: "Enter a rate manually or select Refresh.",
-    rateHint: "You can enter your bank's rate manually. Refreshing replaces it with the API rate.",
-    invalidAmount: "Enter a valid amount of zero or more.",
-    invalidRate: "Enter a positive exchange rate for the selected currency.",
-    insufficient: "Your budget is below the smallest pack price.",
-    available: "Available",
-    value: "Best value",
-    chosen: "Selected",
-    unavailable: "Not enough",
-    perDollar: "Robux per $1",
-    disclaimer: "Unofficial calculator. Packs are based on the supplied screenshot, not fetched from Roblox. Final prices, availability and bank exchange rates may differ. Fees and taxes are not included.",
-    openRoblox: "Open the official Roblox website"
-  },
+  const WORDS = {
+    ru: {
+      theme: "Тема оформления",
+      currency: "Валюта",
+      amount: "Твоя сумма",
+      calculate: "Пересчитать",
+      usd: "Бюджет в долларах",
+      best: "Выгодный пакет",
+      bestHint: "Рекомендуем один доступный пакет с наибольшим количеством Robux за $1. Несколько покупок и подписки в эту рекомендацию не входят.",
+      packs: "Пакеты Robux",
+      selectHint: "Выбери доступный пакет, чтобы посмотреть стоимость и остаток.",
+      selected: "Выбранная покупка",
+      cost: "Стоимость",
+      left: "Останется после покупки",
+      available: "Доступно",
+      unavailable: "Не хватает",
+      value: "Выгодно",
+      chosen: "Выбрано",
+      select: "Выбрать",
+      perDollar: "Robux за $1",
+      rates: "Курсы к 1 USD",
+      refresh: "Обновить",
+      loading: "Загружаем курсы…",
+      updated: "Курсы источника на",
+      cached: "Сохранённые курсы на",
+      manual: "Для выбранной валюты используется ручной курс.",
+      error: "Не удалось обновить курсы.",
+      noRates: "Введи курс вручную или нажми «Обновить».",
+      rateHint: "Курс — количество местной валюты за 1 USD. Можно ввести курс своего банка. Кнопка «Обновить» заменит ручные значения курсами API.",
+      invalidAmount: "Введи сумму не меньше нуля. Например: 50 или 50,25.",
+      invalidRate: "Для расчёта нужен курс выбранной валюты больше нуля.",
+      insufficient: "Пока не хватает на минимальный пакет.",
+      swipe: "Листай карточки влево и вправо и выбирай подписку.",
+      month: "/ месяц",
+      monthlyRobux: "Robux каждый месяц",
+      noRobux: "Без указанного ежемесячного начисления Robux",
+      benefits: "Преимущества Roblox Plus",
+      subscription: "Ежемесячная подписка с автопродлением. Ниже рассчитывается только оплата одного месяца. Базовый Plus не считается пакетом Robux.",
+      firstMonth: "Останется после оплаты одного месяца",
+      footer: "Сайт, на котором вы можете узнать, на какой пакет вам хватит денег. Данные о пакетах взяты с сайта Roblox. Итоговые цены, доступность и банковский курс могут отличаться. Расчёт не учитывает комиссии и налоги.",
+      official: "Открыть официальный сайт Roblox"
+    },
 
-  uk: {
-    currency: "Валюта",
-    amount: "Твоя сума",
-    usd: "Бюджет у доларах",
-    best: "Вигідний пакет",
-    packs: "Пакети Robux",
-    selectHint: "Натисни на доступний пакет, щоб побачити залишок.",
-    bestHint: "Рекомендація — один доступний пакет із найбільшою кількістю Robux за $1. Комбінації кількох покупок не розраховуються.",
-    selected: "Вибрана покупка",
-    cost: "Вартість",
-    left: "Залишиться після покупки",
-    rates: "Курси до 1 USD",
-    refresh: "Оновити",
-    loading: "Завантажуємо курси…",
-    updated: "Курси джерела станом на",
-    cached: "Збережені курси станом на",
-    manual: "Використовується курс, введений вручну.",
-    error: "Не вдалося оновити курси.",
-    noRates: "Введи курс вручну або натисни «Оновити».",
-    rateHint: "Можна ввести курс свого банку вручну. Оновлення замінить його курсом API.",
-    invalidAmount: "Введи коректну суму не менше нуля.",
-    invalidRate: "Для розрахунку потрібен курс вибраної валюти більше нуля.",
-    insufficient: "Поки не вистачає на найменший пакет.",
-    available: "Доступно",
-    value: "Вигідно",
-    chosen: "Вибрано",
-    unavailable: "Не вистачає",
-    perDollar: "Robux за $1",
-    disclaimer: "Неофіційний калькулятор. Пакети задані за наданим скриншотом, а не завантажуються з Roblox. Остаточні ціни, доступність і курс банку можуть відрізнятися. Комісії та податки не враховано.",
-    openRoblox: "Відкрити офіційний сайт Roblox"
-  },
+    en: {
+      theme: "Appearance",
+      currency: "Currency",
+      amount: "Your budget",
+      calculate: "Recalculate",
+      usd: "Budget in USD",
+      best: "Best-value pack",
+      bestHint: "We recommend one affordable pack with the most Robux per $1. Multiple purchases and subscriptions are not included.",
+      packs: "Robux packs",
+      selectHint: "Choose an affordable pack to see its cost and your remaining balance.",
+      selected: "Selected purchase",
+      cost: "Cost",
+      left: "Remaining balance",
+      available: "Available",
+      unavailable: "Not enough",
+      value: "Best value",
+      chosen: "Selected",
+      select: "Select",
+      perDollar: "Robux per $1",
+      rates: "Exchange rates per 1 USD",
+      refresh: "Refresh",
+      loading: "Loading exchange rates…",
+      updated: "Source rates as of",
+      cached: "Saved rates as of",
+      manual: "A manual rate is being used for this currency.",
+      error: "Could not refresh exchange rates.",
+      noRates: "Enter a rate manually or select Refresh.",
+      rateHint: "The rate is local currency units per 1 USD. You can enter your bank's rate. Refresh replaces manual values with API rates.",
+      invalidAmount: "Enter a non-negative amount, such as 50 or 50.25.",
+      invalidRate: "Enter a positive rate for the selected currency.",
+      insufficient: "Your budget is below the smallest pack price.",
+      swipe: "Swipe left or right and choose a subscription.",
+      month: "/ month",
+      monthlyRobux: "Robux every month",
+      noRobux: "No monthly Robux allowance listed",
+      benefits: "Roblox Plus benefits",
+      subscription: "Monthly auto-renewing subscription. Only one month's payment is calculated below. Base Plus is not treated as a Robux pack.",
+      firstMonth: "Balance after one month's payment",
+      footer: "A website where you can check which pack you can afford. Pack information is sourced from the Roblox website. Final prices, availability and bank exchange rates may differ. Fees and taxes are not included.",
+      official: "Open the official Roblox website"
+    },
 
-  be: {
-    currency: "Валюта",
-    amount: "Твая сума",
-    usd: "Бюджэт у доларах",
-    best: "Выгадны пакет",
-    packs: "Пакеты Robux",
-    selectHint: "Націсні на даступны пакет, каб убачыць рэшту.",
-    bestHint: "Рэкамендацыя — адзін даступны пакет з найбольшай колькасцю Robux за $1. Камбінацыі некалькіх пакупак не разлічваюцца.",
-    selected: "Выбраная пакупка",
-    cost: "Кошт",
-    left: "Застанецца пасля куплі",
-    rates: "Курсы да 1 USD",
-    refresh: "Абнавіць",
-    loading: "Загружаем курсы…",
-    updated: "Курсы крыніцы на",
-    cached: "Захаваныя курсы на",
-    manual: "Выкарыстоўваецца курс, уведзены ўручную.",
-    error: "Не ўдалося абнавіць курсы.",
-    noRates: "Увядзі курс уручную або націсні «Абнавіць».",
-    rateHint: "Можна ўвесці курс свайго банка ўручную. Абнаўленне заменіць яго курсам API.",
-    invalidAmount: "Увядзі карэктную суму не меншую за нуль.",
-    invalidRate: "Для разліку патрэбны курс выбранай валюты большы за нуль.",
-    insufficient: "Пакуль не хапае на найменшы пакет.",
-    available: "Даступна",
-    value: "Выгадна",
-    chosen: "Выбрана",
-    unavailable: "Не хапае",
-    perDollar: "Robux за $1",
-    disclaimer: "Неафіцыйны калькулятар. Пакеты зададзены паводле дасланага скрыншота, а не загружаюцца з Roblox. Канчатковыя цэны, даступнасць і курс банка могуць адрознівацца. Камісіі і падаткі не ўлічаны.",
-    openRoblox: "Адкрыць афіцыйны сайт Roblox"
-  }
-};
+    uk: {
+      theme: "Тема оформлення",
+      currency: "Валюта",
+      amount: "Твоя сума",
+      calculate: "Перерахувати",
+      usd: "Бюджет у доларах",
+      best: "Вигідний пакет",
+      bestHint: "Рекомендуємо один доступний пакет із найбільшою кількістю Robux за $1. Кілька покупок і підписки не враховуються.",
+      packs: "Пакети Robux",
+      selectHint: "Вибери доступний пакет, щоб побачити вартість і залишок.",
+      selected: "Вибрана покупка",
+      cost: "Вартість",
+      left: "Залишиться після покупки",
+      available: "Доступно",
+      unavailable: "Не вистачає",
+      value: "Вигідно",
+      chosen: "Вибрано",
+      select: "Вибрати",
+      perDollar: "Robux за $1",
+      rates: "Курси до 1 USD",
+      refresh: "Оновити",
+      loading: "Завантажуємо курси…",
+      updated: "Курси джерела станом на",
+      cached: "Збережені курси станом на",
+      manual: "Для вибраної валюти використовується ручний курс.",
+      error: "Не вдалося оновити курси.",
+      noRates: "Введи курс вручну або натисни «Оновити».",
+      rateHint: "Курс — кількість місцевої валюти за 1 USD. Можна ввести курс свого банку. Оновлення замінить ручні значення курсами API.",
+      invalidAmount: "Введи суму не менше нуля. Наприклад: 50 або 50,25.",
+      invalidRate: "Для розрахунку потрібен курс вибраної валюти більше нуля.",
+      insufficient: "Поки не вистачає на найменший пакет.",
+      swipe: "Гортай картки вліво та вправо й вибирай підписку.",
+      month: "/ місяць",
+      monthlyRobux: "Robux щомісяця",
+      noRobux: "Без зазначеного щомісячного нарахування Robux",
+      benefits: "Переваги Roblox Plus",
+      subscription: "Щомісячна підписка з автоподовженням. Нижче розраховується оплата лише одного місяця. Базовий Plus не вважається пакетом Robux.",
+      firstMonth: "Залишиться після оплати одного місяця",
+      footer: "Сайт, на якому можна дізнатися, на який пакет вам вистачить грошей. Дані про пакети взято із сайту Roblox. Остаточні ціни, доступність і курс банку можуть відрізнятися. Комісії та податки не враховано.",
+      official: "Відкрити офіційний сайт Roblox"
+    },
 
-const CITIES = {
-  ru: { zone: "Europe/Moscow", name: "Москва" },
-  en: { zone: "America/New_York", name: "Washington, D.C." },
-  uk: { zone: "Europe/Kyiv", name: "Київ" },
-  be: { zone: "Europe/Minsk", name: "Мінск" }
-};
-
-const SYMBOLS = { BYN: "Br", RUB: "₽", UAH: "₴" };
-const CURRENCIES = ["BYN", "RUB", "UAH"];
-
-const STATE_KEY = "robux-calc-state-v3";
-const CACHE_KEY = "robux-calc-rates-v3";
-const API_URL = "https://open.er-api.com/v6/latest/USD";
-
-const $ = id => document.getElementById(id);
-
-function readStorage(key) {
-  try {
-    return JSON.parse(localStorage.getItem(key));
-  } catch {
-    return null;
-  }
-}
-
-function writeStorage(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-const savedState = readStorage(STATE_KEY) || {};
-
-let language = Object.hasOwn(TRANSLATIONS, savedState.language)
-  ? savedState.language
-  : "ru";
-
-let currency = CURRENCIES.includes(savedState.currency)
-  ? savedState.currency
-  : "BYN";
-
-let selectedCents = Number(savedState.selectedCents) || null;
-
-let rates = {};
-let rateDate = null;
-let rateSource = "none";
-let loading = false;
-let refreshFailed = false;
-
-const manualCurrencies = new Set();
-const rateEditVersion = { BYN: 0, RUB: 0, UAH: 0 };
-
-let clockFormatter;
-let packNodes = [];
-
-function t(key) {
-  return TRANSLATIONS[language][key];
-}
-
-function number(value, digits = 2) {
-  return new Intl.NumberFormat(language, {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits
-  }).format(value);
-}
-
-function money(value) {
-  return "$" + number(value);
-}
-
-function localMoney(value) {
-  return number(value) + " " + currency;
-}
-
-function getManualRates() {
-  const result = {};
-
-  manualCurrencies.forEach(code => {
-    const value = Number($("rate" + code).value);
-    if (Number.isFinite(value) && value > 0) {
-      result[code] = value;
+    be: {
+      theme: "Тэма афармлення",
+      currency: "Валюта",
+      amount: "Твая сума",
+      calculate: "Пералічыць",
+      usd: "Бюджэт у доларах",
+      best: "Выгадны пакет",
+      bestHint: "Рэкамендуем адзін даступны пакет з найбольшай колькасцю Robux за $1. Некалькі пакупак і падпіскі не ўлічваюцца.",
+      packs: "Пакеты Robux",
+      selectHint: "Выберы даступны пакет, каб убачыць кошт і рэшту.",
+      selected: "Выбраная пакупка",
+      cost: "Кошт",
+      left: "Застанецца пасля куплі",
+      available: "Даступна",
+      unavailable: "Не хапае",
+      value: "Выгадна",
+      chosen: "Выбрана",
+      select: "Выбраць",
+      perDollar: "Robux за $1",
+      rates: "Курсы да 1 USD",
+      refresh: "Абнавіць",
+      loading: "Загружаем курсы…",
+      updated: "Курсы крыніцы на",
+      cached: "Захаваныя курсы на",
+      manual: "Для выбранай валюты выкарыстоўваецца ручны курс.",
+      error: "Не ўдалося абнавіць курсы.",
+      noRates: "Увядзі курс уручную або націсні «Абнавіць».",
+      rateHint: "Курс — колькасць мясцовай валюты за 1 USD. Можна ўвесці курс свайго банка. Абнаўленне заменіць ручныя значэнні курсамі API.",
+      invalidAmount: "Увядзі суму не меншую за нуль. Напрыклад: 50 або 50,25.",
+      invalidRate: "Для разліку патрэбны курс выбранай валюты большы за нуль.",
+      insufficient: "Пакуль не хапае на найменшы пакет.",
+      swipe: "Гартай карткі ўлева і ўправа і выбірай падпіску.",
+      month: "/ месяц",
+      monthlyRobux: "Robux штомесяц",
+      noRobux: "Без пазначанага штомесячнага налічэння Robux",
+      benefits: "Перавагі Roblox Plus",
+      subscription: "Штомесячная падпіска з аўтападаўжэннем. Ніжэй разлічваецца аплата толькі аднаго месяца. Базавы Plus не лічыцца пакетам Robux.",
+      firstMonth: "Застанецца пасля аплаты аднаго месяца",
+      footer: "Сайт, на якім можна даведацца, на які пакет вам хопіць грошай. Даныя пра пакеты ўзяты з сайта Roblox. Канчатковыя цэны, даступнасць і курс банка могуць адрознівацца. Камісіі і падаткі не ўлічаны.",
+      official: "Адкрыць афіцыйны сайт Roblox"
     }
-  });
+  };
 
-  return result;
-}
+  const CITIES = {
+    ru: { zone: "Europe/Moscow", name: "Москва" },
+    en: { zone: "America/New_York", name: "Washington, D.C." },
+    uk: { zone: "Europe/Kyiv", name: "Київ" },
+    be: { zone: "Europe/Minsk", name: "Мінск" }
+  };
 
-function saveState() {
-  return writeStorage(STATE_KEY, {
-    language,
-    currency,
-    amount: $("amount").value,
-    selectedCents,
-    manualRates: getManualRates()
-  });
-}
+  const CODES = ["BYN", "RUB", "UAH"];
+  const SYMBOLS = { BYN: "Br", RUB: "₽", UAH: "₴" };
+  const THEMES = ["glass", "amoled", "oled"];
+  const STATE_KEY = "rbxwell-state-v4";
+  const CACHE_KEY = "rbxwell-rates-v4";
+  const API = "https://open.er-api.com/v6/latest/USD";
 
-function applyLanguage() {
-  document.documentElement.lang = language;
-  $("language").value = language;
+  const $ = id => document.getElementById(id);
 
-  document.querySelectorAll("[data-t]").forEach(element => {
-    element.textContent = t(element.dataset.t);
-  });
-
-  $("amount").setAttribute("aria-label", t("amount"));
-  $("clockCity").textContent = CITIES[language].name;
-
-  clockFormatter = new Intl.DateTimeFormat("en-GB", {
-    timeZone: CITIES[language].zone,
-    numberingSystem: "latn",
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23"
-  });
-
-  updateClock();
-  buildPacks();
-  renderRateStatus();
-  calculate();
-}
-
-function updateClock() {
-  const now = new Date();
-
-  const parts = Object.fromEntries(
-    clockFormatter.formatToParts(now).map(part => [
-      part.type,
-      part.value
-    ])
-  );
-
-  $("clockTime").textContent =
-    `${parts.day}:${parts.month}:${parts.year} ` +
-    `${parts.hour}:${parts.minute}:${parts.second}`;
-
-  $("clockTime").dateTime = now.toISOString();
-}
-
-function buildPacks() {
-  $("packs").replaceChildren();
-
-  packNodes = PACKS.map(pack => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "pack";
-
-    button.innerHTML = `
-      <span class="pack-icon" aria-hidden="true">R$</span>
-      <div class="pack-info">
-        <div class="pack-name"></div>
-        <div class="pack-price"></div>
-        <div class="pack-rate"></div>
-      </div>
-      <span class="badge"></span>
-    `;
-
-    button.querySelector(".pack-name").textContent =
-      number(pack.robux, 0) + " Robux";
-
-    button.querySelector(".pack-rate").textContent =
-      number(pack.robux / (pack.cents / 100), 1) +
-      " " + t("perDollar");
-
-    button.addEventListener("click", () => {
-      selectedCents = pack.cents;
-      calculate();
-      saveState();
-    });
-
-    $("packs").append(button);
-
-    return {
-      pack,
-      button,
-      price: button.querySelector(".pack-price"),
-      badge: button.querySelector(".badge")
-    };
-  });
-}
-
-function getAmount() {
-  const text = $("amount").value
-    .trim()
-    .replace(/s/g, "")
-    .replace(",", ".");
-
-  if (!text) return 0;
-
-  if (!/^d+(?:.d*)?$/.test(text)) return NaN;
-
-  const value = Number(text);
-
-  return Number.isFinite(value) ? value : NaN;
-}
-
-function getRate() {
-  const value = Number($("rate" + currency).value);
-
-  return Number.isFinite(value) && value > 0
-    ? value
-    : NaN;
-}
-
-function calculate() {
-  const amount = getAmount();
-  const rate = getRate();
-
-  const validAmount = Number.isFinite(amount) && amount >= 0;
-  const validRate = Number.isFinite(rate) && rate > 0;
-  const valid = validAmount && validRate;
-
-  const usd = valid ? amount / rate : NaN;
-  const budgetCents = valid
-    ? Math.floor(usd * 100 + 0.0000001)
-    : -1;
-
-  const available = PACKS.filter(pack => pack.cents <= budgetCents);
-
-  const best = available.reduce((current, pack) => {
-    if (!current) return pack;
-
-    return pack.robux / pack.cents > current.robux / current.cents
-      ? pack
-      : current;
-  }, null);
-
-  let selected = available.find(pack => pack.cents === selectedCents);
-
-  if (!selected) {
-    selected = best;
-    selectedCents = selected ? selected.cents : null;
-  }
-
-  $("usdValue").textContent = valid ? money(usd) : "—";
-  $("bestValue").textContent = best
-    ? number(best.robux, 0) + " R$"
-    : "—";
-
-  if (!validAmount) {
-    $("inputStatus").textContent = t("invalidAmount");
-  } else if (!validRate) {
-    $("inputStatus").textContent = t("invalidRate");
-  } else if (!best && amount > 0) {
-    $("inputStatus").textContent = t("insufficient");
-  } else {
-    $("inputStatus").textContent = "";
-  }
-
-  packNodes.forEach(({ pack, button, price, badge }) => {
-    const canBuy = valid && pack.cents <= budgetCents;
-    const isBest = !!best && best.cents === pack.cents;
-    const isSelected = !!selected && selected.cents === pack.cents;
-    const usdPrice = pack.cents / 100;
-
-    button.disabled = !canBuy;
-    button.classList.toggle("best", isBest);
-    button.classList.toggle("selected", isSelected);
-    button.setAttribute("aria-pressed", String(isSelected));
-
-    price.textContent = money(usdPrice) +
-      (validRate ? " · ≈ " + localMoney(usdPrice * rate) : "");
-
-    badge.textContent = !canBuy
-      ? t("unavailable")
-      : isSelected
-        ? t("chosen") + (isBest ? " · " + t("value") : "")
-        : isBest
-          ? t("value")
-          : t("available");
-  });
-
-  $("purchase").hidden = !selected;
-
-  if (selected) {
-    const costUsd = selected.cents / 100;
-    const remainingLocal = Math.max(0, amount - costUsd * rate);
-
-    $("selectedRobux").textContent = number(selected.robux, 0);
-    $("selectedCost").textContent =
-      money(costUsd) + " · ≈ " + localMoney(costUsd * rate);
-
-    $("leftLocal").textContent = "≈ " + localMoney(remainingLocal);
-    $("leftUsd").textContent = "≈ " + money(Math.max(0, usd - costUsd));
-  }
-}
-
-function syncCurrency() {
-  document.querySelectorAll("[data-currency]").forEach(button => {
-    const active = button.dataset.currency === currency;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-
-  $("symbol").textContent = SYMBOLS[currency];
-}
-
-function renderRateStatus() {
-  $("refresh").disabled = loading;
-
-  const messages = [];
-
-  if (loading) messages.push(t("loading"));
-  if (refreshFailed) messages.push(t("error"));
-
-  if (manualCurrencies.has(currency)) {
-    messages.push(t("manual"));
-  } else if (rateSource !== "none" && rateDate) {
-    const label = rateSource === "cache" ? t("cached") : t("updated");
-
-    const formattedDate = new Intl.DateTimeFormat(language, {
-      dateStyle: "short",
-      timeStyle: "short"
-    }).format(new Date(rateDate));
-
-    messages.push(label + " " + formattedDate + ".");
-  } else if (!loading) {
-    messages.push(t("noRates"));
-  }
-
-  $("apiStatus").textContent = messages.join(" ");
-}
-
-function restoreRates() {
-  const cache = readStorage(CACHE_KEY);
-
-  if (
-    cache &&
-    cache.rates &&
-    Number.isFinite(cache.timestamp) &&
-    CURRENCIES.every(code =>
-      Number.isFinite(cache.rates[code]) && cache.rates[code] > 0
-    )
-  ) {
-    rates = cache.rates;
-    rateDate = cache.timestamp;
-    rateSource = "cache";
-
-    CURRENCIES.forEach(code => {
-      $("rate" + code).value = rates[code];
-    });
-  }
-
-  const manualRates = savedState.manualRates || {};
-
-  CURRENCIES.forEach(code => {
-    const value = Number(manualRates[code]);
-
-    if (Number.isFinite(value) && value > 0) {
-      $("rate" + code).value = value;
-      manualCurrencies.add(code);
+  function read(key) {
+    try {
+      return JSON.parse(localStorage.getItem(key));
+    } catch (error) {
+      return null;
     }
-  });
-}
+  }
 
-async function loadRates(force = false) {
-  if (loading) return;
-
-  loading = true;
-  refreshFailed = false;
-  renderRateStatus();
-
-  const editSnapshot = { ...rateEditVersion };
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
-
-  try {
-    const response = await fetch(API_URL, {
-      signal: controller.signal
-    });
-
-    if (!response.ok) throw new Error("HTTP error");
-
-    const data = await response.json();
-
-    if (
-      data.result !== "success" ||
-      !data.rates ||
-      !CURRENCIES.every(code =>
-        Number.isFinite(data.rates[code]) && data.rates[code] > 0
-      ) ||
-      !Number.isFinite(data.time_last_update_unix) ||
-      data.time_last_update_unix <= 0
-    ) {
-      throw new Error("Invalid rates");
+  function write(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (error) {
+      return false;
     }
+  }
 
-    rates = Object.fromEntries(
-      CURRENCIES.map(code => [code, data.rates[code]])
-    );
+  const stored = read(STATE_KEY);
+  const saved = stored && typeof stored === "object" ? stored : {};
 
-    rateDate = data.time_last_update_unix * 1000;
-    rateSource = "api";
+  let lang = Object.prototype.hasOwnProperty.call(WORDS, saved.lang)
+    ? saved.lang : "ru";
+  let currency = CODES.includes(saved.currency) ? saved.currency : "BYN";
+  let theme = THEMES.includes(saved.theme) ? saved.theme : "glass";
+  let selectedPack = saved.selectedPack || null;
+  let selectedPlus = saved.selectedPlus || null;
 
-    CURRENCIES.forEach(code => {
-      const editedDuringRequest =
-        rateEditVersion[code] !== editSnapshot[code];
+  let source = "";
+  let sourceTime = null;
+  let loading = false;
+  let failed = false;
 
-      if (
-        !editedDuringRequest &&
-        (force || !manualCurrencies.has(code))
-      ) {
-        $("rate" + code).value = rates[code];
-        manualCurrencies.delete(code);
+  const manual = new Set();
+  const versions = { BYN: 0, RUB: 0, UAH: 0 };
+
+  let packNodes = [];
+  let plusNodes = [];
+  let clockFormatter = null;
+
+  function t(key) {
+    return WORDS[lang][key] || key;
+  }
+
+  function num(value, digits = 2) {
+    try {
+      return new Intl.NumberFormat(lang, {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      }).format(value);
+    } catch (error) {
+      return Number(value).toFixed(digits);
+    }
+  }
+
+  function usd(value) {
+    return "$" + num(value);
+  }
+
+  function local(value) {
+    return num(value) + " " + currency;
+  }
+
+  function parseDecimal(text, emptyAsZero = false) {
+    const clean = String(text)
+      .trim()
+      .replace(/[s  ]/g, "")
+      .replace(",", ".");
+
+    if (!clean) return emptyAsZero ? 0 : NaN;
+
+    if (!/^(?:d+(?:.d*)?|.d+)$/.test(clean)) return NaN;
+
+    const value = Number(clean);
+    return Number.isFinite(value) ? value : NaN;
+  }
+
+  function save() {
+    const manualRates = {};
+
+    CODES.forEach(code => {
+      if (manual.has(code)) {
+        manualRates[code] = $("rate" + code).value;
       }
     });
 
-    writeStorage(CACHE_KEY, {
-      rates,
-      timestamp: rateDate
+    return write(STATE_KEY, {
+      lang,
+      currency,
+      theme,
+      amount: $("amount").value,
+      selectedPack,
+      selectedPlus,
+      manualRates
+    });
+  }
+
+  function applyTheme() {
+    document.documentElement.dataset.theme = theme;
+
+    document.querySelectorAll("#themes button").forEach(button => {
+      const active = button.dataset.theme === theme;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
     });
 
-  } catch (error) {
-    refreshFailed = true;
-  } finally {
-    clearTimeout(timeout);
-    loading = false;
-    renderRateStatus();
-    calculate();
-    saveState();
+    document.querySelector('meta[name="theme-color"]')
+      .setAttribute("content", theme === "glass" ? "#0b0d12" : "#000000");
   }
-}
 
-$("amount").value =
-  typeof savedState.amount === "string" ? savedState.amount : "";
+  function applyCurrency() {
+    document.querySelectorAll("#currencies button").forEach(button => {
+      const active = button.dataset.currency === currency;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
 
-restoreRates();
-syncCurrency();
-applyLanguage();
-
-$("amount").addEventListener("input", () => {
-  calculate();
-  saveState();
-});
-
-document.querySelectorAll("[data-currency]").forEach(button => {
-  button.addEventListener("click", () => {
-    currency = button.dataset.currency;
-    selectedCents = null;
-    syncCurrency();
-    renderRateStatus();
-    calculate();
-    saveState();
-  });
-});
-
-CURRENCIES.forEach(code => {
-  $("rate" + code).addEventListener("input", () => {
-    manualCurrencies.add(code);
-    rateEditVersion[code]++;
-    renderRateStatus();
-    calculate();
-    saveState();
-  });
-});
-
-$("language").addEventListener("change", event => {
-  language = event.target.value;
-
-  if (saveState()) {
-    window.location.reload();
-  } else {
-    applyLanguage();
+    $("symbol").textContent = SYMBOLS[currency];
   }
-});
 
-$("refresh").addEventListener("click", () => {
-  loadRates(true);
-});
+  function configureClock() {
+    $("clockCity").textContent = CITIES[lang].name;
 
-setInterval(updateClock, 1000);
+    const options = {
+      timeZone: CITIES[lang].zone,
+      numberingSystem: "latn",
+      day: "2-digit",
+      month: "2-digit",
+      year: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23"
+    };
 
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) updateClock();
-});
+    try {
+      clockFormatter = new Intl.DateTimeFormat("en-GB", options);
+    } catch (error) {
+      try {
+        if (lang !== "uk") throw error;
+        options.timeZone = "Europe/Kiev";
+        clockFormatter = new Intl.DateTimeFormat("en-GB", options);
+      } catch (fallbackError) {
+        clockFormatter = null;
+      }
+    }
 
-loadRates();
+    updateClock();
+  }
+
+  function updateClock() {
+    if (!clockFormatter) {
+      $("clockTime").textContent = "—";
+      return;
+    }
+
+    try {
+      const now = new Date();
+      const parts = {};
+
+      clockFormatter.formatToParts(now).forEach(part => {
+        parts[part.type] = part.value;
+      });
+
+      $("clockTime").textContent =
+        `${parts.day}:${parts.month}:${parts.year} ` +
+        `${parts.hour}:${parts.minute}:${parts.second}`;
+
+      $("clockTime").dateTime = now.toISOString();
+    } catch (error) {
+      $("clockTime").textContent = "—";
+    }
+  }
+
+  function buildPacks() {
+    $("packs").textContent = "";
+
+    packNodes = PACKS.map(pack => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "pack";
+
+      button.innerHTML = `
+        <span class="pack-icon" aria-hidden="true">R$</span>
+        <div class="pack-info">
+          <div class="pack-name"></div>
+          <div class="pack-price"></div>
+          <div class="pack-rate"></div>
+        </div>
+        <span class="badge"></span>
+      `;
+
+      button.querySelector(".pack-name").textContent =
+        num(pack.robux, 0) + " Robux";
+
+      button.querySelector(".pack-rate").textContent =
+        num(pack.robux * 100 / pack.cents, 1) + " " + t("perDollar");
+
+      button.addEventListener("click", () => {
+        selectedPack = pack.id;
+        calculate();
+        save();
+      });
+
+      $("packs").appendChild(button);
+
+      return {
+        pack,
+        button,
+        price: button.querySelector(".pack-price"),
+        badge: button.querySelector(".badge")
+      };
+    });
+  }
+
+  function buildPlus() {
+    $("plusTrack").textContent = "";
+
+    plusNodes = PLUS.map(plan => {
+      const card = document.createElement("article");
+      card.className = "plus-card";
+
+      card.innerHTML = `
+        <h3></h3>
+        <div class="plus-price"></div>
+        <div class="pack-price"></div>
+        <div class="plus-robux"></div>
+        <p class="note"></p>
+        <button type="button" class="action"></button>
+      `;
+
+      card.querySelector("h3").textContent = plan.name;
+      card.querySelector(".plus-price").textContent =
+        usd(plan.cents / 100) + " " + t("month");
+
+      card.querySelector(".plus-robux").textContent = plan.robux
+        ? num(plan.robux, 0) + " " + t("monthlyRobux")
+        : t("noRobux");
+
+      card.querySelector(".note").textContent = t("benefits");
+
+      const button = card.querySelector("button");
+
+      button.addEventListener("click", () => {
+        selectedPlus = plan.id;
+        calculate();
+        save();
+      });
+
+      $("plusTrack").appendChild(card);
+
+      return {
+        plan,
+        card,
+        button,
+        price: card.querySelector(".pack-price")
+      };
+    });
+  }
+
+  function renderPurchase(targetId, item, amount, rate, subscription) {
+    const box = $(targetId);
+    box.hidden = !item;
+
+    if (!item) {
+      box.textContent = "";
+      return;
+    }
+
+    const costUsd = item.cents / 100;
+    const leftLocal = Math.max(0, amount - costUsd * rate);
+    const leftUsd = Math.max(0, amount / rate - costUsd);
+
+    box.innerHTML = `
+      <h3></h3>
+      <div class="purchase-row">
+        <span class="item-label"></span>
+        <strong class="item-value"></strong>
+      </div>
+      <div class="purchase-row">
+        <span class="cost-label"></span>
+        <strong class="cost-value"></strong>
+      </div>
+      <div class="remaining">
+        <span class="label"></span>
+        <div class="value"></div>
+        <div class="note"></div>
+      </div>
+    `;
+
+    box.querySelector("h3").textContent = t("selected");
+    box.querySelector(".item-label").textContent =
+      subscription ? "Roblox Plus" : "Robux";
+
+    box.querySelector(".item-value").textContent =
+      subscription ? item.name : num(item.robux, 0);
+
+    box.querySelector(".cost-label").textContent = t("cost");
+    box.querySelector(".cost-value").textContent =
+      usd(costUsd) + " · ≈ " + local(costUsd * rate);
+
+    box.querySelector(".remaining .label").textContent =
+      t(subscription ? "firstMonth" : "left");
+
+    box.querySelector(".remaining .value").textContent =
+      "≈ " + local(leftLocal);
+
+    box.querySelector(".remaining .note").textContent =
+      "≈ " + usd(leftUsd);
+  }
+
+  function calculate() {
+    const amount = parseDecimal($("amount").value, true);
+    const rate = parseDecimal($("rate" + currency).value);
+
+    const amountValid = Number.isFinite(amount) && amount >= 0;
+    const rateValid = Number.isFinite(rate) && rate > 0;
+    const budget = amountValid && rateValid ? amount / rate : NaN;
+    const valid = Number.isFinite(budget);
+
+    const cents = valid ? Math.floor(budget * 100 + 1e-7) : -1;
+    const available = PACKS.filter(pack => pack.cents <= cents);
+
+    let best = null;
+
+    available.forEach(pack => {
+      if (!best || pack.robux / pack.cents > best.robux / best.cents) {
+        best = pack;
+      }
+    });
+
+    let chosenPack = available.find(pack => pack.id === selectedPack);
+
+    if (!chosenPack) {
+      chosenPack = best;
+      selectedPack = chosenPack ? chosenPack.id : null;
+    }
+
+    const chosenPlus = PLUS.find(plan =>
+      plan.id === selectedPlus && plan.cents <= cents
+    ) || null;
+
+    if (!chosenPlus) selectedPlus = null;
+
+    $("usdValue").textContent = valid ? usd(budget) : "—";
+    $("bestValue").textContent = best
+      ? num(best.robux, 0) + " R$"
+      : "—";
+
+    if (!amountValid) {
+      $("inputStatus").textContent = t("invalidAmount");
+    } else if (!rateValid || !valid) {
+      $("inputStatus").textContent = t("invalidRate");
+    } else if (amount > 0 && !best) {
+      $("inputStatus").textContent = t("insufficient");
+    } else {
+      $("inputStatus").textContent = "";
+    }
+
+    packNodes.forEach(node => {
+      const canBuy = node.pack.cents <= cents;
+      const isBest = !!best && best.id === node.pack.id;
+      const isSelected = !!chosenPack && chosenPack.id === node.pack.id;
+      const priceUsd = node.pack.cents / 100;
+
+      node.button.disabled = !canBuy;
+      node.button.classList.toggle("best", isBest);
+      node.button.classList.toggle("selected", isSelected);
+      node.button.setAttribute("aria-pressed", String(isSelected));
+
+      node.price.textContent = usd(priceUsd) +
+        (rateValid ? " · ≈ " + local(priceUsd * rate) : "");
+
+      node.badge.textContent = !canBuy
+        ? t("unavailable")
+        : isSelected
+          ? t("chosen") + (isBest ? " · " + t("value") : "")
+          : isBest ? t("value") : t("available");
+    });
+
+    plusNodes.forEach(node => {
+      const canBuy = node.plan.cents <= cents;
+      const isSelected = !!chosenPlus && chosenPlus.id === node.plan.id;
+
+      node.card.classList.toggle("selected", isSelected);
+      node.button.disabled = !canBuy;
+      node.button.setAttribute("aria-pressed", String(isSelected));
+      node.button.textContent = !canBuy
+        ? t("unavailable")
+        : isSelected ? t("chosen") : t("select");
+
+      node.price.textContent = rateValid
+        ? "≈ " + local(node.plan.cents / 100 * rate) + " " + t("month")
+        : "—";
+    });
+
+    renderPurchase("packPurchase", chosenPack, amount, rate, false);
+    renderPurchase("plusPurchase", chosenPlus, amount, rate, true);
+  }
+
+  function renderRateStatus() {
+    $("refresh").disabled = loading;
+
+    const messages = [];
+
+    if (loading) messages.push(t("loading"));
+    if (failed) messages.push(t("error"));
+
+    if (manual.has(currency)) {
+      messages.push(t("manual"));
+    } else if (sourceTime) {
+      let date;
+
+      try {
+        date = new Date(sourceTime).toLocaleString(lang);
+      } catch (error) {
+        date = new Date(sourceTime).toISOString();
+      }
+
+      messages.push(
+        t(source === "cache" ? "cached" : "updated") + " " + date + "."
+      );
+    } else if (!loading) {
+      messages.push(t("noRates"));
+    }
+
+    $("apiStatus").textContent = messages.join(" ");
+  }
+
+  function restoreRates() {
+    const cache = read(CACHE_KEY);
+
+    if (
+      cache &&
+      cache.rates &&
+      Number.isFinite(cache.timestamp) &&
+      cache.timestamp > 0 &&
+      CODES.every(code =>
+        Number.isFinite(cache.rates[code]) && cache.rates[code] > 0
+      )
+    ) {
+      CODES.forEach(code => {
+        $("rate" + code).value = cache.rates[code];
+      });
+
+      sourceTime = cache.timestamp;
+      source = "cache";
+    }
+
+    if (saved.manualRates && typeof saved.manualRates === "object") {
+      CODES.forEach(code => {
+        if (typeof saved.manualRates[code] === "string") {
+          $("rate" + code).value = saved.manualRates[code];
+          manual.add(code);
+        }
+      });
+    }
+  }
+
+  async function loadRates(force) {
+    if (loading) return;
+
+    loading = true;
+    failed = false;
+    renderRateStatus();
+
+    const snapshot = Object.assign({}, versions);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
+
+    try {
+      const response = await fetch(API, {
+        signal: controller.signal
+      });
+
+      if (!response.ok) throw new Error("HTTP error");
+
+      const data = await response.json();
+
+      if (
+        data.result !== "success" ||
+        data.base_code !== "USD" ||
+        !data.rates ||
+        !CODES.every(code =>
+          Number.isFinite(data.rates[code]) && data.rates[code] > 0
+        ) ||
+        !Number.isFinite(data.time_last_update_unix) ||
+        data.time_last_update_unix <= 0
+      ) {
+        throw new Error("Invalid exchange rates");
+      }
+
+      const rates = {};
+      CODES.forEach(code => {
+        rates[code] = data.rates[code];
+
+        const editedDuringRequest = versions[code] !== snapshot[code];
+
+        if (!editedDuringRequest && (force || !manual.has(code))) {
+          $("rate" + code).value = rates[code];
+          manual.delete(code);
+        }
+      });
+
+      source = "api";
+      sourceTime = data.time_last_update_unix * 1000;
+
+      write(CACHE_KEY, {
+        rates,
+        timestamp: sourceTime
+      });
+
+    } catch (error) {
+      failed = true;
+    } finally {
+      clearTimeout(timer);
+      loading = false;
+      renderRateStatus();
+      calculate();
+      save();
+    }
+  }
+
+  function applyLanguage() {
+    document.documentElement.lang = lang;
+    $("language").value = lang;
+
+    document.querySelectorAll("[data-t]").forEach(element => {
+      element.textContent = t(element.dataset.t);
+    });
+
+    buildPacks();
+    buildPlus();
+    calculate();
+    renderRateStatus();
+    configureClock();
+  }
+
+  $("amount").value =
+    typeof saved.amount === "string" ? saved.amount : "";
+
+  $("amount").addEventListener("input", () => {
+    calculate();
+    save();
+  });
+
+  $("amount").addEventListener("change", () => {
+    calculate();
+    save();
+  });
+
+  $("calculate").addEventListener("click", () => {
+    calculate();
+    save();
+  });
+
+  document.querySelectorAll("#currencies button").forEach(button => {
+    button.addEventListener("click", () => {
+      currency = button.dataset.currency;
+      selectedPack = null;
+      selectedPlus = null;
+      applyCurrency();
+      calculate();
+      renderRateStatus();
+      save();
+    });
+  });
+
+  document.querySelectorAll("#themes button").forEach(button => {
+    button.addEventListener("click", () => {
+      theme = button.dataset.theme;
+      applyTheme();
+      save();
+    });
+  });
+
+  CODES.forEach(code => {
+    $("rate" + code).addEventListener("input", () => {
+      manual.add(code);
+      versions[code]++;
+      calculate();
+      renderRateStatus();
+      save();
+    });
+  });
+
+  $("refresh").addEventListener("click", () => {
+    loadRates(true);
+  });
+
+  $("language").addEventListener("change", event => {
+    lang = event.target.value;
+
+    if (save()) {
+      window.location.reload();
+    } else {
+      applyLanguage();
+    }
+  });
+
+  function slide(direction) {
+    const track = $("plusTrack");
+    const firstCard = track.querySelector(".plus-card");
+
+    if (!firstCard) return;
+
+    const distance = firstCard.getBoundingClientRect().width + 12;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    track.scrollBy({
+      left: direction * distance,
+      behavior: reducedMotion ? "auto" : "smooth"
+    });
+  }
+
+  $("plusPrevious").addEventListener("click", () => slide(-1));
+  $("plusNext").addEventListener("click", () => slide(1));
+
+  restoreRates();
+  applyTheme();
+  applyCurrency();
+  applyLanguage();
+
+  setInterval(updateClock, 1000);
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      updateClock();
+      calculate();
+    }
+  });
+
+  loadRates(false);
+})();
 </script>
 </body>
 </html>

@@ -1,1575 +1,226 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0d12">
 <title>RBXWell — Robux Calculator</title>
-
 <style>
-:root {
-  color-scheme: dark;
-  --bg: #0b0d12;
-  --surface: rgba(24, 29, 40, .86);
-  --soft: rgba(255,255,255,.045);
-  --border: rgba(255,255,255,.10);
-  --text: #f2f4fa;
-  --muted: #a2acbd;
-  --accent: #b9caff;
-  --accent-bg: rgba(124,156,255,.10);
-  --green: #a7edc4;
-  --green-bg: rgba(74,222,128,.07);
-  --glow:
-    radial-gradient(650px 420px at 0% 0%, #7699ff20, transparent 65%),
-    radial-gradient(600px 420px at 100% 10%, #a979ff16, transparent 65%);
-}
-
-html[data-theme="amoled"] {
-  --bg: #000;
-  --surface: #000;
-  --soft: #080808;
-  --border: #252525;
-  --accent: #e5e5e5;
-  --accent-bg: #101010;
-  --glow: none;
-}
-
-html[data-theme="oled"] {
-  --bg: #000;
-  --surface: rgba(10,10,16,.95);
-  --soft: #0d0d16;
-  --border: #27243b;
-  --accent: #ccbaff;
-  --accent-bg: rgba(165,125,255,.10);
-  --glow:
-    radial-gradient(550px 350px at 100% 0%, #8850ff19, transparent 65%);
-}
-
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  margin: 0;
-  min-height: 100dvh;
-  padding: 20px 14px calc(30px + env(safe-area-inset-bottom));
-  color: var(--text);
-  background: var(--glow), var(--bg);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-button, input, select {
-  font: inherit;
-}
-
-button, select {
-  cursor: pointer;
-}
-
-button, input, select {
-  color: var(--text);
-}
-
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
-button:disabled {
-  cursor: default;
-}
-
-[hidden] {
-  display: none !important;
-}
-
-.app {
-  max-width: 570px;
-  margin: auto;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 16px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  flex-shrink: 0;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -.5px;
-}
-
-.brand-icon {
-  display: grid;
-  place-items: center;
-  width: 29px;
-  height: 29px;
-  border-radius: 10px;
-  background: var(--accent);
-  color: #101016;
-  font-size: 12px;
-  letter-spacing: 0;
-}
-
-.clock {
-  flex: 1;
-  min-width: 0;
-  padding: 9px 5px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--surface);
-  text-align: center;
-}
-
-.clock-city {
-  margin-bottom: 4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--muted);
-  font-size: 10px;
-}
-
-.clock-time {
-  display: block;
-  white-space: nowrap;
-  font-size: 11px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.language {
-  width: 105px;
-  padding: 12px 6px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--surface);
-  font-size: 12px;
-}
-
-option {
-  background: #15151c;
-  color: #fff;
-}
-
-.card {
-  margin-bottom: 14px;
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: 25px;
-  background: var(--surface);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-}
-
-.section-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.title {
-  margin: 0 0 13px;
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 650;
-}
-
-.section-heading .title {
-  margin: 0;
-}
-
-.segment {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.segment button {
-  min-height: 44px;
-  padding: 9px 5px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--soft);
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.segment button.active {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #11131b;
-}
-
-.amount-label {
-  display: block;
-  margin-top: 19px;
-}
-
-.amount-wrap {
-  position: relative;
-}
-
-.amount {
-  width: 100%;
-  padding: 17px 70px 17px 16px;
-  border: 1px solid var(--border);
-  border-radius: 17px;
-  background: var(--soft);
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.symbol {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.action {
-  min-height: 40px;
-  padding: 9px 13px;
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  background: var(--soft);
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.action:disabled {
-  opacity: .5;
-}
-
-.calculate {
-  width: 100%;
-  margin-top: 11px;
-}
-
-.summary {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.summary-box, .purchase {
-  padding: 15px;
-  border: 1px solid var(--border);
-  border-radius: 17px;
-  background: var(--accent-bg);
-}
-
-.label {
-  display: block;
-  margin-bottom: 7px;
-  color: var(--accent);
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-.value {
-  font-size: 23px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-
-.note {
-  margin: 12px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.packs {
-  display: grid;
-  gap: 9px;
-}
-
-.pack {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 14px 12px;
-  text-align: left;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--soft);
-}
-
-.pack:disabled {
-  opacity: .55;
-}
-
-.pack.best {
-  border-color: #69bc8b;
-  background: var(--green-bg);
-}
-
-.pack.selected {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
-}
-
-.pack-icon {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 35px;
-  height: 35px;
-  border-radius: 11px;
-  background: var(--accent-bg);
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.pack-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.pack-name {
-  font-size: 16px;
-  font-weight: 750;
-}
-
-.pack-price, .pack-rate {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-.badge {
-  max-width: 100px;
-  padding: 6px 8px;
-  border-radius: 12px;
-  background: var(--green-bg);
-  color: var(--green);
-  text-align: center;
-  font-size: 10px;
-  line-height: 1.5;
-}
-
-.pack:disabled .badge {
-  background: var(--soft);
-  color: var(--muted);
-}
-
-.purchase {
-  margin-top: 15px;
-}
-
-.purchase h3 {
-  margin: 0 0 12px;
-  font-size: 15px;
-}
-
-.purchase-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
-  font-size: 13px;
-}
-
-.purchase-row span {
-  color: var(--muted);
-}
-
-.purchase-row strong {
-  text-align: right;
-}
-
-.remaining {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-
-.remaining .value {
-  color: var(--green);
-}
-
-.arrows {
-  display: flex;
-  gap: 6px;
-}
-
-.arrow {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--soft);
-  font-size: 18px;
-}
-
-.plus-track {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 3px 2px 14px;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: 2px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-
-.plus-card {
-  flex: 0 0 84%;
-  min-width: 0;
-  padding: 20px;
-  scroll-snap-align: start;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: var(--soft);
-}
-
-.plus-card.selected {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
-}
-
-.plus-card h3 {
-  margin: 0 0 8px;
-  font-size: 22px;
-}
-
-.plus-price {
-  color: var(--accent);
-  font-size: 23px;
-  font-weight: 800;
-}
-
-.plus-card .action {
-  width: 100%;
-  margin-top: 16px;
-}
-
-.plus-robux {
-  margin-top: 18px;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.rate-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.rate-row label {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.rate-input {
-  width: 135px;
-  padding: 11px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--soft);
-  text-align: right;
-}
-
-.source {
-  display: inline-block;
-  margin-top: 12px;
-  color: var(--accent);
-  font-size: 12px;
-  line-height: 1.5;
-  text-decoration: none;
-}
-
-.footer {
-  padding: 5px 8px;
-  text-align: center;
-}
-
-@media (max-width: 390px) {
-  .header {
-    flex-wrap: wrap;
-  }
-
-  .brand {
-    flex: 1;
-  }
-
-  .clock {
-    order: 3;
-    flex: 0 0 100%;
-  }
-
-  .clock-time {
-    font-size: 14px;
-  }
-
-  .card {
-    padding: 15px;
-  }
-
-  .value {
-    font-size: 19px;
-  }
-
-  .pack-icon {
-    display: none;
-  }
-
-  .plus-card {
-    flex-basis: 93%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    scroll-behavior: auto !important;
-  }
-}
+:root{
+  color-scheme:dark;
+  --bg:#0b0d12;--surface:#161b25;--soft:#1e2431;--border:rgba(255,255,255,.09);
+  --text:#f2f4fa;--muted:#a2acbd;--accent:#b9caff;--green:#a7edc4;
+  --radius:22px;--shadow:0 18px 50px rgba(0,0,0,.28)
+}
+html[data-theme=amoled]{--bg:#000;--surface:#000;--soft:#070707;--border:#232323;--accent:#e8e8e8}
+html[data-theme=oled]{--bg:#000;--surface:#0b0b12;--soft:#101018;--border:#27243b;--accent:#ccbaff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100dvh;padding:18px 14px calc(28px + env(safe-area-inset-bottom));background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:580px;margin:auto}
+button,input,select{font:inherit;color:inherit}
+button,select{cursor:pointer}
+button:disabled{cursor:default;opacity:.45}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+[hidden]{display:none!important}
+header{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:-.4px}
+.logo{width:34px;height:34px;flex:none}
+.clock{flex:1;min-width:145px;text-align:center;font-size:11px;font-variant-numeric:tabular-nums}
+.clock small{display:block;color:var(--muted);margin-bottom:3px}
+select,button,input{border:1px solid var(--border);border-radius:14px;background:var(--soft);padding:11px}
+select{font-size:12px}
+.card{padding:20px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;background:var(--surface);box-shadow:var(--shadow)}
+h2{font-size:14px;color:var(--muted);margin:0 0 14px}
+.segment{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.segment button{min-height:44px;font-size:13px;font-weight:700}
+.active{background:var(--accent);color:#11131b;border-color:transparent}
+.amount-label{display:block;margin:18px 0 10px;color:var(--muted);font-size:14px}
+.amount-wrap{position:relative}
+#amount{width:100%;font-size:28px;font-weight:750;padding:17px 70px 17px 16px}
+.symbol{position:absolute;right:16px;top:50%;translate:0 -50%;color:var(--muted);font-weight:700}
+.action{color:var(--accent);font-size:12px;font-weight:650}
+.wide{width:100%;margin-top:10px}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.box,.purchase{padding:15px;border:1px solid var(--border);border-radius:17px;background:var(--soft)}
+.label{display:block;font-size:11px;color:var(--accent);margin-bottom:7px}
+.value{font-size:23px;font-weight:800;overflow-wrap:anywhere}
+.note{font-size:12px;color:var(--muted);line-height:1.6;margin:12px 0 0}
+.bonus-toggle{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px}
+.bonus-toggle input{accent-color:var(--accent);width:19px;height:19px}
+.packs{display:grid;gap:9px}
+.pack{display:flex;align-items:center;gap:10px;text-align:left;width:100%;padding:14px 12px;border-radius:18px}
+.info{flex:1;min-width:0}
+.name{font-size:16px;font-weight:750}
+.price,.rate{display:block;font-size:11px;color:var(--muted);margin-top:5px}
+.bonus{display:block;color:var(--green);font-size:12px;margin-top:6px}
+.badge{font-size:10px;max-width:100px;text-align:center;color:var(--green)}
+.best{border-color:#69bc8b}
+.selected{box-shadow:inset 0 0 0 1px var(--accent);border-color:var(--accent)}
+.purchase{margin-top:15px}
+.purchase h3{font-size:15px;margin:0 0 12px}
+.row{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:13px}
+.row span{color:var(--muted)}
+.row strong{text-align:right}
+.remaining{border-top:1px solid var(--border);margin-top:14px;padding-top:14px}
+.remaining .value{color:var(--green)}
+.heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.heading h2{margin:0}
+.arrows{display:flex;gap:6px}
+.arrows button{font-size:18px;padding:5px;width:36px;height:36px}
+.track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding:3px 2px 14px}
+.plan{flex:0 0 84%;scroll-snap-align:start;padding:20px;border:1px solid var(--border);border-radius:20px;background:var(--soft)}
+.plan h3{font-size:22px;margin:0 0 8px}
+.plan-price{font-size:23px;font-weight:800;color:var(--accent)}
+.rate-input{width:135px;text-align:right}
+.rate-row{align-items:center}
+a{color:var(--accent);font-size:12px;line-height:1.6}
+footer{text-align:center;padding:5px 8px}
+footer a{display:inline-block;margin-top:12px}
+#splash{position:fixed;inset:0;z-index:99;display:grid;place-items:center;background:var(--bg);transition:opacity .45s ease,visibility .45s}
+#splash.done{opacity:0;visibility:hidden;pointer-events:none}
+.splash-logo{width:118px;height:118px;animation:pop .75s cubic-bezier(.2,.9,.2,1) both}
+.splash-text{margin-top:14px;font-weight:800;letter-spacing:-.6px;font-size:25px;animation:rise .65s .15s cubic-bezier(.2,.9,.2,1) both}
+.splash-sub{color:var(--muted);font-size:12px;margin-top:6px;animation:rise .65s .25s cubic-bezier(.2,.9,.2,1) both}
+@keyframes pop{from{opacity:0;scale:.72;filter:blur(7px)}to{opacity:1;scale:1;filter:blur(0)}}
+@keyframes rise{from{opacity:0;translate:0 9px}to{opacity:1;translate:0 0}}
+@media(max-width:390px){.clock{order:3;flex-basis:100%;font-size:14px}.brand{flex:1}.card{padding:15px}.value{font-size:19px}.plan{flex-basis:93%}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
-
 <body>
-<main class="app">
+<div id="splash" aria-hidden="true">
+  <div>
+    <svg class="splash-logo" viewBox="0 0 120 120" role="img" aria-label="RBXWell">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dfe7ff"/><stop offset="1" stop-color="#9d7dff"/></linearGradient></defs>
+      <rect x="16" y="16" width="88" height="88" rx="24" fill="url(#g)"/>
+      <rect x="40" y="40" width="40" height="40" rx="9" fill="#0b0d12"/>
+      <text x="60" y="56" text-anchor="middle" fill="#e8ecff" font-family="Arial, sans-serif" font-size="13" font-weight="800">RBX</text>
+      <text x="60" y="72" text-anchor="middle" fill="#e8ecff" font-family="Arial, sans-serif" font-size="13" font-weight="800">Well</text>
+    </svg>
+    <div class="splash-text">RBXWell</div>
+    <div class="splash-sub">Robux Calculator</div>
+  </div>
+</div>
 
-  <header class="header">
-    <div class="brand">
-      <span class="brand-icon" aria-hidden="true">R$</span>
-      RBXWell
-    </div>
+<main>
+<header>
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 120 120" aria-hidden="true">
+      <rect x="16" y="16" width="88" height="88" rx="24" fill="#b9caff"/>
+      <rect x="40" y="40" width="40" height="40" rx="9" fill="#0b0d12"/>
+      <text x="60" y="57" text-anchor="middle" fill="#e8ecff" font-family="Arial, sans-serif" font-size="14" font-weight="800">RBX</text>
+      <text x="60" y="73" text-anchor="middle" fill="#e8ecff" font-family="Arial, sans-serif" font-size="14" font-weight="800">Well</text>
+    </svg>
+    RBXWell
+  </div>
+  <div class="clock"><small id="city"></small><time id="clock">—</time></div>
+  <select id="language" aria-label="Language">
+    <option value="ru">Русский</option><option value="en">English</option>
+    <option value="uk">Українська</option><option value="be">Беларуская</option>
+  </select>
+</header>
 
-    <div class="clock">
-      <div id="clockCity" class="clock-city"></div>
-      <time id="clockTime" class="clock-time">—</time>
-    </div>
+<section class="card">
+  <h2 data-t="0"></h2>
+  <div class="segment" id="themes">
+    <button data-theme="glass">Glass</button>
+    <button data-theme="amoled">AMOLED</button>
+    <button data-theme="oled">OLED</button>
+  </div>
+</section>
 
-    <select id="language" class="language" aria-label="Language">
-      <option value="ru">Русский</option>
-      <option value="en">English</option>
-      <option value="uk">Українська</option>
-      <option value="be">Беларуская</option>
-    </select>
-  </header>
+<section class="card">
+  <h2 data-t="1"></h2>
+  <div class="segment" id="currencies">
+    <button data-code="BYN">BYN</button><button data-code="RUB">RUB</button><button data-code="UAH">UAH</button>
+  </div>
+  <label for="amount" class="amount-label" data-t="2"></label>
+  <div class="amount-wrap"><input id="amount" inputmode="decimal" autocomplete="off" placeholder="0"><span class="symbol" id="symbol"></span></div>
+  <button class="action wide" id="calculate" data-t="30"></button>
+  <label class="bonus-toggle"><input type="checkbox" id="bonus"><span data-t="15"></span></label>
+  <p class="note" data-t="16"></p>
+  <div class="summary">
+    <div class="box"><span class="label" data-t="3"></span><div class="value" id="usd">—</div></div>
+    <div class="box"><span class="label" data-t="4"></span><div class="value" id="best">—</div></div>
+  </div>
+  <p class="note" role="status" id="status"></p>
+  <p class="note" data-t="28"></p>
+</section>
 
-  <section class="card">
-    <h2 class="title" data-t="theme"></h2>
-    <div class="segment" id="themes">
-      <button type="button" data-theme="glass">Glass</button>
-      <button type="button" data-theme="amoled">AMOLED</button>
-      <button type="button" data-theme="oled">OLED</button>
-    </div>
-  </section>
+<section class="card">
+  <h2 data-t="5"></h2>
+  <div class="packs" id="packs"></div>
+  <section class="purchase" id="packPurchase" hidden></section>
+</section>
 
-  <section class="card">
-    <h2 class="title" data-t="currency"></h2>
+<section class="card">
+  <div class="heading"><h2>Roblox Plus</h2><div class="arrows"><button id="prev" aria-label="Previous">‹</button><button id="next" aria-label="Next">›</button></div></div>
+  <p class="note" data-t="25"></p>
+  <div class="track" id="plans"></div>
+  <p class="note" data-t="20"></p>
+  <section class="purchase" id="plusPurchase" hidden></section>
+</section>
 
-    <div class="segment" id="currencies">
-      <button type="button" data-currency="BYN">BYN</button>
-      <button type="button" data-currency="RUB">RUB</button>
-      <button type="button" data-currency="UAH">UAH</button>
-    </div>
+<section class="card">
+  <div class="heading"><h2 data-t="10"></h2><button class="action" id="refresh" data-t="11"></button></div>
+  <div id="rates"></div>
+  <p class="note" role="status" id="apiStatus"></p>
+  <p class="note" id="rateHint"></p>
+  <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer">Rates By ExchangeRate-API</a>
+</section>
 
-    <label for="amount" class="title amount-label" data-t="amount"></label>
-
-    <div class="amount-wrap">
-      <input
-        id="amount"
-        class="amount"
-        type="text"
-        inputmode="decimal"
-        autocomplete="off"
-        placeholder="0"
-      >
-      <span id="symbol" class="symbol"></span>
-    </div>
-
-    <button id="calculate" type="button"
-      class="action calculate" data-t="calculate"></button>
-
-    <div class="summary">
-      <div class="summary-box">
-        <span class="label" data-t="usd"></span>
-        <div id="usdValue" class="value">—</div>
-      </div>
-
-      <div class="summary-box">
-        <span class="label" data-t="best"></span>
-        <div id="bestValue" class="value">—</div>
-      </div>
-    </div>
-
-    <p id="inputStatus" class="note" role="status"></p>
-    <p class="note" data-t="bestHint"></p>
-  </section>
-
-  <section class="card">
-    <h2 class="title" data-t="packs"></h2>
-    <p class="note" data-t="selectHint" style="margin:0 0 14px"></p>
-    <div id="packs" class="packs"></div>
-    <section id="packPurchase" class="purchase" hidden></section>
-  </section>
-
-  <section class="card">
-    <div class="section-heading">
-      <h2 class="title">Roblox Plus</h2>
-
-      <div class="arrows">
-        <button id="plusPrevious" class="arrow" type="button"
-          aria-label="Previous">‹</button>
-        <button id="plusNext" class="arrow" type="button"
-          aria-label="Next">›</button>
-      </div>
-    </div>
-
-    <p class="note" data-t="swipe" style="margin:0 0 14px"></p>
-    <div id="plusTrack" class="plus-track"></div>
-
-    <p class="note" data-t="subscription"></p>
-    <section id="plusPurchase" class="purchase" hidden></section>
-  </section>
-
-  <section class="card">
-    <div class="section-heading">
-      <h2 class="title" data-t="rates"></h2>
-      <button id="refresh" class="action" type="button"
-        data-t="refresh"></button>
-    </div>
-
-    <div class="rate-row">
-      <label for="rateBYN">1 USD = BYN</label>
-      <input id="rateBYN" class="rate-input"
-        type="text" inputmode="decimal" placeholder="—">
-    </div>
-
-    <div class="rate-row">
-      <label for="rateRUB">1 USD = RUB</label>
-      <input id="rateRUB" class="rate-input"
-        type="text" inputmode="decimal" placeholder="—">
-    </div>
-
-    <div class="rate-row">
-      <label for="rateUAH">1 USD = UAH</label>
-      <input id="rateUAH" class="rate-input"
-        type="text" inputmode="decimal" placeholder="—">
-    </div>
-
-    <p id="apiStatus" class="note" role="status"></p>
-    <p class="note" data-t="rateHint"></p>
-
-    <a class="source"
-       href="https://www.exchangerate-api.com"
-       target="_blank"
-       rel="noopener noreferrer">Rates By ExchangeRate-API</a>
-  </section>
-
-  <footer class="footer">
-    <p class="note" data-t="footer"></p>
-    <a class="source"
-       href="https://www.roblox.com/upgrades/robux"
-       target="_blank"
-       rel="noopener noreferrer"
-       data-t="official"></a>
-  </footer>
-
+<footer>
+  <p class="note" data-t="21"></p>
+  <a href="https://www.roblox.com/upgrades/robux" target="_blank" rel="noopener noreferrer" data-t="22"></a>
+</footer>
 </main>
 
 <script>
-(function () {
-  "use strict";
-
-  const PACKS = [
-    { id: "r40", robux: 40, cents: 49 },
-    { id: "r80", robux: 80, cents: 99 },
-    { id: "r400", robux: 400, cents: 499 },
-    { id: "r800", robux: 800, cents: 999 },
-    { id: "r1200", robux: 1200, cents: 1499 },
-    { id: "r1700", robux: 1700, cents: 1999 },
-    { id: "r3150", robux: 3150, cents: 3499 },
-    { id: "r4500", robux: 4500, cents: 4999 },
-    { id: "r10000", robux: 10000, cents: 9999 },
-    { id: "r22500", robux: 22500, cents: 19999 }
-  ];
-
-  const PLUS = [
-    { id: "plus", name: "Roblox Plus", cents: 499, robux: 0 },
-    { id: "plus500", name: "Plus 500", cents: 899, robux: 500 },
-    { id: "plus1000", name: "Plus 1000", cents: 1299, robux: 1000 },
-    { id: "plus2000", name: "Plus 2000", cents: 2199, robux: 2000 }
-  ];
-
-  const WORDS = {
-    ru: {
-      theme: "Тема оформления",
-      currency: "Валюта",
-      amount: "Твоя сумма",
-      calculate: "Пересчитать",
-      usd: "Бюджет в долларах",
-      best: "Выгодный пакет",
-      bestHint: "Рекомендуем один доступный пакет с наибольшим количеством Robux за $1. Несколько покупок и подписки в эту рекомендацию не входят.",
-      packs: "Пакеты Robux",
-      selectHint: "Выбери доступный пакет, чтобы посмотреть стоимость и остаток.",
-      selected: "Выбранная покупка",
-      cost: "Стоимость",
-      left: "Останется после покупки",
-      available: "Доступно",
-      unavailable: "Не хватает",
-      value: "Выгодно",
-      chosen: "Выбрано",
-      select: "Выбрать",
-      perDollar: "Robux за $1",
-      rates: "Курсы к 1 USD",
-      refresh: "Обновить",
-      loading: "Загружаем курсы…",
-      updated: "Курсы источника на",
-      cached: "Сохранённые курсы на",
-      manual: "Для выбранной валюты используется ручной курс.",
-      error: "Не удалось обновить курсы.",
-      noRates: "Введи курс вручную или нажми «Обновить».",
-      rateHint: "Курс — количество местной валюты за 1 USD. Можно ввести курс своего банка. Кнопка «Обновить» заменит ручные значения курсами API.",
-      invalidAmount: "Введи сумму не меньше нуля. Например: 50 или 50,25.",
-      invalidRate: "Для расчёта нужен курс выбранной валюты больше нуля.",
-      insufficient: "Пока не хватает на минимальный пакет.",
-      swipe: "Листай карточки влево и вправо и выбирай подписку.",
-      month: "/ месяц",
-      monthlyRobux: "Robux каждый месяц",
-      noRobux: "Без указанного ежемесячного начисления Robux",
-      benefits: "Преимущества Roblox Plus",
-      subscription: "Ежемесячная подписка с автопродлением. Ниже рассчитывается только оплата одного месяца. Базовый Plus не считается пакетом Robux.",
-      firstMonth: "Останется после оплаты одного месяца",
-      footer: "Сайт, на котором вы можете узнать, на какой пакет вам хватит денег. Данные о пакетах взяты с сайта Roblox. Итоговые цены, доступность и банковский курс могут отличаться. Расчёт не учитывает комиссии и налоги.",
-      official: "Открыть официальный сайт Roblox"
-    },
-
-    en: {
-      theme: "Appearance",
-      currency: "Currency",
-      amount: "Your budget",
-      calculate: "Recalculate",
-      usd: "Budget in USD",
-      best: "Best-value pack",
-      bestHint: "We recommend one affordable pack with the most Robux per $1. Multiple purchases and subscriptions are not included.",
-      packs: "Robux packs",
-      selectHint: "Choose an affordable pack to see its cost and your remaining balance.",
-      selected: "Selected purchase",
-      cost: "Cost",
-      left: "Remaining balance",
-      available: "Available",
-      unavailable: "Not enough",
-      value: "Best value",
-      chosen: "Selected",
-      select: "Select",
-      perDollar: "Robux per $1",
-      rates: "Exchange rates per 1 USD",
-      refresh: "Refresh",
-      loading: "Loading exchange rates…",
-      updated: "Source rates as of",
-      cached: "Saved rates as of",
-      manual: "A manual rate is being used for this currency.",
-      error: "Could not refresh exchange rates.",
-      noRates: "Enter a rate manually or select Refresh.",
-      rateHint: "The rate is local currency units per 1 USD. You can enter your bank's rate. Refresh replaces manual values with API rates.",
-      invalidAmount: "Enter a non-negative amount, such as 50 or 50.25.",
-      invalidRate: "Enter a positive rate for the selected currency.",
-      insufficient: "Your budget is below the smallest pack price.",
-      swipe: "Swipe left or right and choose a subscription.",
-      month: "/ month",
-      monthlyRobux: "Robux every month",
-      noRobux: "No monthly Robux allowance listed",
-      benefits: "Roblox Plus benefits",
-      subscription: "Monthly auto-renewing subscription. Only one month's payment is calculated below. Base Plus is not treated as a Robux pack.",
-      firstMonth: "Balance after one month's payment",
-      footer: "A website where you can check which pack you can afford. Pack information is sourced from the Roblox website. Final prices, availability and bank exchange rates may differ. Fees and taxes are not included.",
-      official: "Open the official Roblox website"
-    },
-
-    uk: {
-      theme: "Тема оформлення",
-      currency: "Валюта",
-      amount: "Твоя сума",
-      calculate: "Перерахувати",
-      usd: "Бюджет у доларах",
-      best: "Вигідний пакет",
-      bestHint: "Рекомендуємо один доступний пакет із найбільшою кількістю Robux за $1. Кілька покупок і підписки не враховуються.",
-      packs: "Пакети Robux",
-      selectHint: "Вибери доступний пакет, щоб побачити вартість і залишок.",
-      selected: "Вибрана покупка",
-      cost: "Вартість",
-      left: "Залишиться після покупки",
-      available: "Доступно",
-      unavailable: "Не вистачає",
-      value: "Вигідно",
-      chosen: "Вибрано",
-      select: "Вибрати",
-      perDollar: "Robux за $1",
-      rates: "Курси до 1 USD",
-      refresh: "Оновити",
-      loading: "Завантажуємо курси…",
-      updated: "Курси джерела станом на",
-      cached: "Збережені курси станом на",
-      manual: "Для вибраної валюти використовується ручний курс.",
-      error: "Не вдалося оновити курси.",
-      noRates: "Введи курс вручну або натисни «Оновити».",
-      rateHint: "Курс — кількість місцевої валюти за 1 USD. Можна ввести курс свого банку. Оновлення замінить ручні значення курсами API.",
-      invalidAmount: "Введи суму не менше нуля. Наприклад: 50 або 50,25.",
-      invalidRate: "Для розрахунку потрібен курс вибраної валюти більше нуля.",
-      insufficient: "Поки не вистачає на найменший пакет.",
-      swipe: "Гортай картки вліво та вправо й вибирай підписку.",
-      month: "/ місяць",
-      monthlyRobux: "Robux щомісяця",
-      noRobux: "Без зазначеного щомісячного нарахування Robux",
-      benefits: "Переваги Roblox Plus",
-      subscription: "Щомісячна підписка з автоподовженням. Нижче розраховується оплата лише одного місяця. Базовий Plus не вважається пакетом Robux.",
-      firstMonth: "Залишиться після оплати одного місяця",
-      footer: "Сайт, на якому можна дізнатися, на який пакет вам вистачить грошей. Дані про пакети взято із сайту Roblox. Остаточні ціни, доступність і курс банку можуть відрізнятися. Комісії та податки не враховано.",
-      official: "Відкрити офіційний сайт Roblox"
-    },
-
-    be: {
-      theme: "Тэма афармлення",
-      currency: "Валюта",
-      amount: "Твая сума",
-      calculate: "Пералічыць",
-      usd: "Бюджэт у доларах",
-      best: "Выгадны пакет",
-      bestHint: "Рэкамендуем адзін даступны пакет з найбольшай колькасцю Robux за $1. Некалькі пакупак і падпіскі не ўлічваюцца.",
-      packs: "Пакеты Robux",
-      selectHint: "Выберы даступны пакет, каб убачыць кошт і рэшту.",
-      selected: "Выбраная пакупка",
-      cost: "Кошт",
-      left: "Застанецца пасля куплі",
-      available: "Даступна",
-      unavailable: "Не хапае",
-      value: "Выгадна",
-      chosen: "Выбрана",
-      select: "Выбраць",
-      perDollar: "Robux за $1",
-      rates: "Курсы да 1 USD",
-      refresh: "Абнавіць",
-      loading: "Загружаем курсы…",
-      updated: "Курсы крыніцы на",
-      cached: "Захаваныя курсы на",
-      manual: "Для выбранай валюты выкарыстоўваецца ручны курс.",
-      error: "Не ўдалося абнавіць курсы.",
-      noRates: "Увядзі курс уручную або націсні «Абнавіць».",
-      rateHint: "Курс — колькасць мясцовай валюты за 1 USD. Можна ўвесці курс свайго банка. Абнаўленне заменіць ручныя значэнні курсамі API.",
-      invalidAmount: "Увядзі суму не меншую за нуль. Напрыклад: 50 або 50,25.",
-      invalidRate: "Для разліку патрэбны курс выбранай валюты большы за нуль.",
-      insufficient: "Пакуль не хапае на найменшы пакет.",
-      swipe: "Гартай карткі ўлева і ўправа і выбірай падпіску.",
-      month: "/ месяц",
-      monthlyRobux: "Robux штомесяц",
-      noRobux: "Без пазначанага штомесячнага налічэння Robux",
-      benefits: "Перавагі Roblox Plus",
-      subscription: "Штомесячная падпіска з аўтападаўжэннем. Ніжэй разлічваецца аплата толькі аднаго месяца. Базавы Plus не лічыцца пакетам Robux.",
-      firstMonth: "Застанецца пасля аплаты аднаго месяца",
-      footer: "Сайт, на якім можна даведацца, на які пакет вам хопіць грошай. Даныя пра пакеты ўзяты з сайта Roblox. Канчатковыя цэны, даступнасць і курс банка могуць адрознівацца. Камісіі і падаткі не ўлічаны.",
-      official: "Адкрыць афіцыйны сайт Roblox"
-    }
-  };
-
-  const CITIES = {
-    ru: { zone: "Europe/Moscow", name: "Москва" },
-    en: { zone: "America/New_York", name: "Washington, D.C." },
-    uk: { zone: "Europe/Kyiv", name: "Київ" },
-    be: { zone: "Europe/Minsk", name: "Мінск" }
-  };
-
-  const CODES = ["BYN", "RUB", "UAH"];
-  const SYMBOLS = { BYN: "Br", RUB: "₽", UAH: "₴" };
-  const THEMES = ["glass", "amoled", "oled"];
-  const STATE_KEY = "rbxwell-state-v4";
-  const CACHE_KEY = "rbxwell-rates-v4";
-  const API = "https://open.er-api.com/v6/latest/USD";
-
-  const $ = id => document.getElementById(id);
-
-  function read(key) {
-    try {
-      return JSON.parse(localStorage.getItem(key));
-    } catch (error) {
-      return null;
-    }
-  }
-
-  function write(key, value) {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  const stored = read(STATE_KEY);
-  const saved = stored && typeof stored === "object" ? stored : {};
-
-  let lang = Object.prototype.hasOwnProperty.call(WORDS, saved.lang)
-    ? saved.lang : "ru";
-  let currency = CODES.includes(saved.currency) ? saved.currency : "BYN";
-  let theme = THEMES.includes(saved.theme) ? saved.theme : "glass";
-  let selectedPack = saved.selectedPack || null;
-  let selectedPlus = saved.selectedPlus || null;
-
-  let source = "";
-  let sourceTime = null;
-  let loading = false;
-  let failed = false;
-
-  const manual = new Set();
-  const versions = { BYN: 0, RUB: 0, UAH: 0 };
-
-  let packNodes = [];
-  let plusNodes = [];
-  let clockFormatter = null;
-
-  function t(key) {
-    return WORDS[lang][key] || key;
-  }
-
-  function num(value, digits = 2) {
-    try {
-      return new Intl.NumberFormat(lang, {
-        minimumFractionDigits: digits,
-        maximumFractionDigits: digits
-      }).format(value);
-    } catch (error) {
-      return Number(value).toFixed(digits);
-    }
-  }
-
-  function usd(value) {
-    return "$" + num(value);
-  }
-
-  function local(value) {
-    return num(value) + " " + currency;
-  }
-
-function parseDecimal(text, emptyAsZero = false) {
-  let clean = String(text).trim();
-
-  // Убираем пробелы, включая неразрывные.
-  clean = clean
-    .split(" ").join("")
-    .split(String.fromCharCode(160)).join("")
-    .split(String.fromCharCode(8239)).join("");
-
-  // Пустая сумма считается нулём, пустой курс — ошибкой.
-  if (clean === "") {
-    return emptyAsZero ? 0 : NaN;
-  }
-
-  // Принимаем и запятую, и точку.
-  clean = clean.split(",").join(".");
-
-  let decimalPoints = 0;
-  let digits = 0;
-
-  for (const character of clean) {
-    if (character === ".") {
-      decimalPoints++;
-
-      if (decimalPoints > 1) {
-        return NaN;
-      }
-
-      continue;
-    }
-
-    if (character < "0" || character > "9") {
-      return NaN;
-    }
-
-    digits++;
-  }
-
-  if (digits === 0) {
-    return NaN;
-  }
-
-  const value = Number(clean);
-
-  return Number.isFinite(value) ? value : NaN;
-}
-
-  function save() {
-    const manualRates = {};
-
-    CODES.forEach(code => {
-      if (manual.has(code)) {
-        manualRates[code] = $("rate" + code).value;
-      }
-    });
-
-    return write(STATE_KEY, {
-      lang,
-      currency,
-      theme,
-      amount: $("amount").value,
-      selectedPack,
-      selectedPlus,
-      manualRates
-    });
-  }
-
-  function applyTheme() {
-    document.documentElement.dataset.theme = theme;
-
-    document.querySelectorAll("#themes button").forEach(button => {
-      const active = button.dataset.theme === theme;
-      button.classList.toggle("active", active);
-      button.setAttribute("aria-pressed", String(active));
-    });
-
-    document.querySelector('meta[name="theme-color"]')
-      .setAttribute("content", theme === "glass" ? "#0b0d12" : "#000000");
-  }
-
-  function applyCurrency() {
-    document.querySelectorAll("#currencies button").forEach(button => {
-      const active = button.dataset.currency === currency;
-      button.classList.toggle("active", active);
-      button.setAttribute("aria-pressed", String(active));
-    });
-
-    $("symbol").textContent = SYMBOLS[currency];
-  }
-
-  function configureClock() {
-    $("clockCity").textContent = CITIES[lang].name;
-
-    const options = {
-      timeZone: CITIES[lang].zone,
-      numberingSystem: "latn",
-      day: "2-digit",
-      month: "2-digit",
-      year: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hourCycle: "h23"
-    };
-
-    try {
-      clockFormatter = new Intl.DateTimeFormat("en-GB", options);
-    } catch (error) {
-      try {
-        if (lang !== "uk") throw error;
-        options.timeZone = "Europe/Kiev";
-        clockFormatter = new Intl.DateTimeFormat("en-GB", options);
-      } catch (fallbackError) {
-        clockFormatter = null;
-      }
-    }
-
-    updateClock();
-  }
-
-  function updateClock() {
-    if (!clockFormatter) {
-      $("clockTime").textContent = "—";
-      return;
-    }
-
-    try {
-      const now = new Date();
-      const parts = {};
-
-      clockFormatter.formatToParts(now).forEach(part => {
-        parts[part.type] = part.value;
-      });
-
-      $("clockTime").textContent =
-        `${parts.day}:${parts.month}:${parts.year} ` +
-        `${parts.hour}:${parts.minute}:${parts.second}`;
-
-      $("clockTime").dateTime = now.toISOString();
-    } catch (error) {
-      $("clockTime").textContent = "—";
-    }
-  }
-
-  function buildPacks() {
-    $("packs").textContent = "";
-
-    packNodes = PACKS.map(pack => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "pack";
-
-      button.innerHTML = `
-        <span class="pack-icon" aria-hidden="true">R$</span>
-        <div class="pack-info">
-          <div class="pack-name"></div>
-          <div class="pack-price"></div>
-          <div class="pack-rate"></div>
-        </div>
-        <span class="badge"></span>
-      `;
-
-      button.querySelector(".pack-name").textContent =
-        num(pack.robux, 0) + " Robux";
-
-      button.querySelector(".pack-rate").textContent =
-        num(pack.robux * 100 / pack.cents, 1) + " " + t("perDollar");
-
-      button.addEventListener("click", () => {
-        selectedPack = pack.id;
-        calculate();
-        save();
-      });
-
-      $("packs").appendChild(button);
-
-      return {
-        pack,
-        button,
-        price: button.querySelector(".pack-price"),
-        badge: button.querySelector(".badge")
-      };
-    });
-  }
-
-  function buildPlus() {
-    $("plusTrack").textContent = "";
-
-    plusNodes = PLUS.map(plan => {
-      const card = document.createElement("article");
-      card.className = "plus-card";
-
-      card.innerHTML = `
-        <h3></h3>
-        <div class="plus-price"></div>
-        <div class="pack-price"></div>
-        <div class="plus-robux"></div>
-        <p class="note"></p>
-        <button type="button" class="action"></button>
-      `;
-
-      card.querySelector("h3").textContent = plan.name;
-      card.querySelector(".plus-price").textContent =
-        usd(plan.cents / 100) + " " + t("month");
-
-      card.querySelector(".plus-robux").textContent = plan.robux
-        ? num(plan.robux, 0) + " " + t("monthlyRobux")
-        : t("noRobux");
-
-      card.querySelector(".note").textContent = t("benefits");
-
-      const button = card.querySelector("button");
-
-      button.addEventListener("click", () => {
-        selectedPlus = plan.id;
-        calculate();
-        save();
-      });
-
-      $("plusTrack").appendChild(card);
-
-      return {
-        plan,
-        card,
-        button,
-        price: card.querySelector(".pack-price")
-      };
-    });
-  }
-
-  function renderPurchase(targetId, item, amount, rate, subscription) {
-    const box = $(targetId);
-    box.hidden = !item;
-
-    if (!item) {
-      box.textContent = "";
-      return;
-    }
-
-    const costUsd = item.cents / 100;
-    const leftLocal = Math.max(0, amount - costUsd * rate);
-    const leftUsd = Math.max(0, amount / rate - costUsd);
-
-    box.innerHTML = `
-      <h3></h3>
-      <div class="purchase-row">
-        <span class="item-label"></span>
-        <strong class="item-value"></strong>
-      </div>
-      <div class="purchase-row">
-        <span class="cost-label"></span>
-        <strong class="cost-value"></strong>
-      </div>
-      <div class="remaining">
-        <span class="label"></span>
-        <div class="value"></div>
-        <div class="note"></div>
-      </div>
-    `;
-
-    box.querySelector("h3").textContent = t("selected");
-    box.querySelector(".item-label").textContent =
-      subscription ? "Roblox Plus" : "Robux";
-
-    box.querySelector(".item-value").textContent =
-      subscription ? item.name : num(item.robux, 0);
-
-    box.querySelector(".cost-label").textContent = t("cost");
-    box.querySelector(".cost-value").textContent =
-      usd(costUsd) + " · ≈ " + local(costUsd * rate);
-
-    box.querySelector(".remaining .label").textContent =
-      t(subscription ? "firstMonth" : "left");
-
-    box.querySelector(".remaining .value").textContent =
-      "≈ " + local(leftLocal);
-
-    box.querySelector(".remaining .note").textContent =
-      "≈ " + usd(leftUsd);
-  }
-
-  function calculate() {
-    const amount = parseDecimal($("amount").value, true);
-    const rate = parseDecimal($("rate" + currency).value);
-
-    const amountValid = Number.isFinite(amount) && amount >= 0;
-    const rateValid = Number.isFinite(rate) && rate > 0;
-    const budget = amountValid && rateValid ? amount / rate : NaN;
-    const valid = Number.isFinite(budget);
-
-    const cents = valid ? Math.floor(budget * 100 + 1e-7) : -1;
-    const available = PACKS.filter(pack => pack.cents <= cents);
-
-    let best = null;
-
-    available.forEach(pack => {
-      if (!best || pack.robux / pack.cents > best.robux / best.cents) {
-        best = pack;
-      }
-    });
-
-    let chosenPack = available.find(pack => pack.id === selectedPack);
-
-    if (!chosenPack) {
-      chosenPack = best;
-      selectedPack = chosenPack ? chosenPack.id : null;
-    }
-
-    const chosenPlus = PLUS.find(plan =>
-      plan.id === selectedPlus && plan.cents <= cents
-    ) || null;
-
-    if (!chosenPlus) selectedPlus = null;
-
-    $("usdValue").textContent = valid ? usd(budget) : "—";
-    $("bestValue").textContent = best
-      ? num(best.robux, 0) + " R$"
-      : "—";
-
-    if (!amountValid) {
-      $("inputStatus").textContent = t("invalidAmount");
-    } else if (!rateValid || !valid) {
-      $("inputStatus").textContent = t("invalidRate");
-    } else if (amount > 0 && !best) {
-      $("inputStatus").textContent = t("insufficient");
-    } else {
-      $("inputStatus").textContent = "";
-    }
-
-    packNodes.forEach(node => {
-      const canBuy = node.pack.cents <= cents;
-      const isBest = !!best && best.id === node.pack.id;
-      const isSelected = !!chosenPack && chosenPack.id === node.pack.id;
-      const priceUsd = node.pack.cents / 100;
-
-      node.button.disabled = !canBuy;
-      node.button.classList.toggle("best", isBest);
-      node.button.classList.toggle("selected", isSelected);
-      node.button.setAttribute("aria-pressed", String(isSelected));
-
-      node.price.textContent = usd(priceUsd) +
-        (rateValid ? " · ≈ " + local(priceUsd * rate) : "");
-
-      node.badge.textContent = !canBuy
-        ? t("unavailable")
-        : isSelected
-          ? t("chosen") + (isBest ? " · " + t("value") : "")
-          : isBest ? t("value") : t("available");
-    });
-
-    plusNodes.forEach(node => {
-      const canBuy = node.plan.cents <= cents;
-      const isSelected = !!chosenPlus && chosenPlus.id === node.plan.id;
-
-      node.card.classList.toggle("selected", isSelected);
-      node.button.disabled = !canBuy;
-      node.button.setAttribute("aria-pressed", String(isSelected));
-      node.button.textContent = !canBuy
-        ? t("unavailable")
-        : isSelected ? t("chosen") : t("select");
-
-      node.price.textContent = rateValid
-        ? "≈ " + local(node.plan.cents / 100 * rate) + " " + t("month")
-        : "—";
-    });
-
-    renderPurchase("packPurchase", chosenPack, amount, rate, false);
-    renderPurchase("plusPurchase", chosenPlus, amount, rate, true);
-  }
-
-  function renderRateStatus() {
-    $("refresh").disabled = loading;
-
-    const messages = [];
-
-    if (loading) messages.push(t("loading"));
-    if (failed) messages.push(t("error"));
-
-    if (manual.has(currency)) {
-      messages.push(t("manual"));
-    } else if (sourceTime) {
-      let date;
-
-      try {
-        date = new Date(sourceTime).toLocaleString(lang);
-      } catch (error) {
-        date = new Date(sourceTime).toISOString();
-      }
-
-      messages.push(
-        t(source === "cache" ? "cached" : "updated") + " " + date + "."
-      );
-    } else if (!loading) {
-      messages.push(t("noRates"));
-    }
-
-    $("apiStatus").textContent = messages.join(" ");
-  }
-
-  function restoreRates() {
-    const cache = read(CACHE_KEY);
-
-    if (
-      cache &&
-      cache.rates &&
-      Number.isFinite(cache.timestamp) &&
-      cache.timestamp > 0 &&
-      CODES.every(code =>
-        Number.isFinite(cache.rates[code]) && cache.rates[code] > 0
-      )
-    ) {
-      CODES.forEach(code => {
-        $("rate" + code).value = cache.rates[code];
-      });
-
-      sourceTime = cache.timestamp;
-      source = "cache";
-    }
-
-    if (saved.manualRates && typeof saved.manualRates === "object") {
-      CODES.forEach(code => {
-        if (typeof saved.manualRates[code] === "string") {
-          $("rate" + code).value = saved.manualRates[code];
-          manual.add(code);
-        }
-      });
-    }
-  }
-
-  async function loadRates(force) {
-    if (loading) return;
-
-    loading = true;
-    failed = false;
-    renderRateStatus();
-
-    const snapshot = Object.assign({}, versions);
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 12000);
-
-    try {
-      const response = await fetch(API, {
-        signal: controller.signal
-      });
-
-      if (!response.ok) throw new Error("HTTP error");
-
-      const data = await response.json();
-
-      if (
-        data.result !== "success" ||
-        data.base_code !== "USD" ||
-        !data.rates ||
-        !CODES.every(code =>
-          Number.isFinite(data.rates[code]) && data.rates[code] > 0
-        ) ||
-        !Number.isFinite(data.time_last_update_unix) ||
-        data.time_last_update_unix <= 0
-      ) {
-        throw new Error("Invalid exchange rates");
-      }
-
-      const rates = {};
-      CODES.forEach(code => {
-        rates[code] = data.rates[code];
-
-        const editedDuringRequest = versions[code] !== snapshot[code];
-
-        if (!editedDuringRequest && (force || !manual.has(code))) {
-          $("rate" + code).value = rates[code];
-          manual.delete(code);
-        }
-      });
-
-      source = "api";
-      sourceTime = data.time_last_update_unix * 1000;
-
-      write(CACHE_KEY, {
-        rates,
-        timestamp: sourceTime
-      });
-
-    } catch (error) {
-      failed = true;
-    } finally {
-      clearTimeout(timer);
-      loading = false;
-      renderRateStatus();
-      calculate();
-      save();
-    }
-  }
-
-  function applyLanguage() {
-    document.documentElement.lang = lang;
-    $("language").value = lang;
-
-    document.querySelectorAll("[data-t]").forEach(element => {
-      element.textContent = t(element.dataset.t);
-    });
-
-    buildPacks();
-    buildPlus();
-    calculate();
-    renderRateStatus();
-    configureClock();
-  }
-
-  $("amount").value =
-    typeof saved.amount === "string" ? saved.amount : "";
-
-  $("amount").addEventListener("input", () => {
-    calculate();
-    save();
-  });
-
-  $("amount").addEventListener("change", () => {
-    calculate();
-    save();
-  });
-
-  $("calculate").addEventListener("click", () => {
-    calculate();
-    save();
-  });
-
-  document.querySelectorAll("#currencies button").forEach(button => {
-    button.addEventListener("click", () => {
-      currency = button.dataset.currency;
-      selectedPack = null;
-      selectedPlus = null;
-      applyCurrency();
-      calculate();
-      renderRateStatus();
-      save();
-    });
-  });
-
-  document.querySelectorAll("#themes button").forEach(button => {
-    button.addEventListener("click", () => {
-      theme = button.dataset.theme;
-      applyTheme();
-      save();
-    });
-  });
-
-  CODES.forEach(code => {
-    $("rate" + code).addEventListener("input", () => {
-      manual.add(code);
-      versions[code]++;
-      calculate();
-      renderRateStatus();
-      save();
-    });
-  });
-
-  $("refresh").addEventListener("click", () => {
-    loadRates(true);
-  });
-
-  $("language").addEventListener("change", event => {
-    lang = event.target.value;
-
-    if (save()) {
-      window.location.reload();
-    } else {
-      applyLanguage();
-    }
-  });
-
-  function slide(direction) {
-    const track = $("plusTrack");
-    const firstCard = track.querySelector(".plus-card");
-
-    if (!firstCard) return;
-
-    const distance = firstCard.getBoundingClientRect().width + 12;
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    track.scrollBy({
-      left: direction * distance,
-      behavior: reducedMotion ? "auto" : "smooth"
-    });
-  }
-
-  $("plusPrevious").addEventListener("click", () => slide(-1));
-  $("plusNext").addEventListener("click", () => slide(1));
-
-  restoreRates();
-  applyTheme();
-  applyCurrency();
-  applyLanguage();
-
-  setInterval(updateClock, 1000);
-
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      updateClock();
-      calculate();
-    }
-  });
-
-  loadRates(false);
-})();
-</script>
+(()=>{'use strict';
+const WORDS={
+ru:['Тема оформления','Валюта','Твоя сумма','Бюджет в USD','Выгодный пакет','Пакеты Robux','Выбрать','Выбрано','Не хватает','Стоимость','Останется','Курсы к 1 USD','Обновить','Загрузка…','Не удалось обновить курсы. Введите курс вручную.','Считать с бонусом +25%','Бонус — пример расчёта, а не гарантия: Roblox предлагает до 25%, условия зависят от покупки. Не прибавляйте бонус повторно, если он уже включён в пакет.','Введите сумму не меньше нуля и курс больше нуля.','Рекомендуется один доступный пакет с наибольшим количеством Robux за $1.','Robux за $1','Ежемесячная подписка с автопродлением. Расчёт за один месяц; бонус +25% к подпискам не применяется.','Цены пакетов — примеры, не актуальный каталог. Проверьте цену и количество на Roblox. Налоги и комиссии не учтены.','Официальный Roblox','/ месяц','Без ежемесячных Robux','Листайте карточки влево и вправо.','Доступно','За один месяц останется','Курс источника на','Ручной курс','Пересчитать'],
+en:['Appearance','Currency','Your budget','Budget in USD','Best-value pack','Robux packs','Select','Selected','Not enough','Cost','Remaining balance','Rates per 1 USD','Refresh','Loading…','Could not refresh rates. Enter a rate manually.','Calculate with +25% bonus','Bonus is an illustration, not a guarantee: Roblox offers up to 25%, depending on the purchase. Do not add it again if already included.','Enter a non-negative budget and a positive rate.','Recommends one affordable pack with the most Robux per $1.','Robux per $1','Monthly auto-renewing subscription. One month only; +25% does not apply to subscriptions.','Pack prices are examples, not a current catalogue. Check Roblox before purchasing. Taxes and fees excluded.','Official Roblox','/ month','No monthly Robux','Swipe left or right.','Available','Balance after one month','Source rates as of','Manual rate','Recalculate'],
+uk:['Тема оформлення','Валюта','Твоя сума','Бюджет у USD','Вигідний пакет','Пакети Robux','Вибрати','Вибрано','Не вистачає','Вартість','Залишиться','Курси до 1 USD','Оновити','Завантаження…','Не вдалося оновити курси. Введіть курс вручну.','Рахувати з бонусом +25%','Бонус — приклад, не гарантія: Roblox пропонує до 25% залежно від покупки. Не додавайте його повторно, якщо вже враховано.','Введіть суму не менше нуля та курс більше нуля.','Один доступний пакет із найбільшою кількістю Robux за $1.','Robux за $1','Щомісячна підписка з автоподовженням. Розрахунок за один місяць; +25% не застосовується до підписок.','Ціни пакетів — приклади, не актуальний каталог. Перевірте дані на Roblox. Податки та комісії не враховано.','Офіційний Roblox','/ місяць','Без щомісячних Robux','Гортайте картки вліво та вправо.','Доступно','Залишок після оплати місяця','Курси джерела станом на','Ручний курс','Перерахувати'],
+be:['Тэма афармлення','Валюта','Твая сума','Бюджэт у USD','Выгадны пакет','Пакеты Robux','Выбраць','Выбрана','Не хапае','Кошт','Застанецца','Курсы да 1 USD','Абнавіць','Загрузка…','Не ўдалося абнавіць курсы. Увядзіце курс уручную.','Лічыць з бонусам +25%','Бонус — прыклад, не гарантыя: Roblox прапануе да 25% у залежнасці ад пакупкі. Не дадавайце яго паўторна, калі ўжо ўлічаны.','Увядзіце суму не меншую за нуль і курс большы за нуль.','Адзін даступны пакет з найбольшай колькасцю Robux за $1.','Robux за $1','Штомесячная падпіска з аўтападаўжэннем. Разлік за адзін месяц; +25% не ўжываецца да падпісак.','Цэны пакетаў — прыклады, не актуальны каталог. Праверце даныя на Roblox. Падаткі і камісіі не ўлічаны.','Афіцыйны Roblox','/ месяц','Без штомесячных Robux','Гартайце карткі ўлева і ўправа.','Даступна','Рэшта пасля аплаты месяца','Курсы крыніцы на','Ручны курс','Пералічыць']};
+
+const PACKS=[[40,49],[80,99],[400,499],[800,999],[1200,1499],[1700,1999],[3150,3499],[4500,4999],[10000,9999],[22500,19999]].map(([robux,cents])=>({id:'r'+robux,robux,cents}));
+const PLUS=[{id:'plus',name:'Roblox Plus',cents:499,robux:0},{id:'plus500',name:'Plus 500',cents:899,robux:500},{id:'plus1000',name:'Plus 1000',cents:1299,robux:1000},{id:'plus2000',name:'Plus 2000',cents:2199,robux:2000}];
+const $=id=>document.getElementById(id),CODES=['BYN','RUB','UAH'],KEY='rbxwell-state-v4',CACHE='rbxwell-rates-v4',TTL=86400000;
+function read(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}}
+function write(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+const raw=read(KEY),saved=raw&&typeof raw==='object'?raw:{};
+let lang=Object.hasOwn(WORDS,saved.lang)?saved.lang:'ru',currency=CODES.includes(saved.currency)?saved.currency:'BYN',theme=['glass','amoled','oled'].includes(saved.theme)?saved.theme:'glass';
+let selectedPack=saved.selectedPack||null,selectedPlus=saved.selectedPlus||null,loading=false,failed=false,sourceTime=0,cached=false,raf=0,saveTimer=0,clockTimer=0;
+const manual=new Set(),versions={BYN:0,RUB:0,UAH:0},rateInputs={},packNodes=[],planNodes=[],formats=new Map();let clockFormat;
+const t=i=>WORDS[lang][i];
+function num(v,d=2){let f=formats.get(d);if(!f){f=new Intl.NumberFormat(lang,{minimumFractionDigits:d,maximumFractionDigits:d});formats.set(d,f)}return f.format(v)}
+const usd=v=>'$'+num(v),local=v=>num(v)+' '+currency;
+function decimal(v,zero=false){const s=String(v).trim().replace(/[ \u00a0\u202f]/g,'').replace(/,/g,'.');return !s?(zero?0:NaN):/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(s)&&Number.isFinite(Number(s))?Number(s):NaN}
+function save(){clearTimeout(saveTimer);const manualRates={};for(const c of manual)manualRates[c]=rateInputs[c].value;write(KEY,{lang,currency,theme,amount:$('amount').value,selectedPack,selectedPlus,bonus:$('bonus').checked,manualRates})}
+function queueSave(){clearTimeout(saveTimer);saveTimer=setTimeout(save,250)}
+function setText(el,s){if(el.textContent!==s)el.textContent=s}
+function schedule(){if(!raf)raf=requestAnimationFrame(()=>{raf=0;calculate()});queueSave()}
+for(const c of CODES){const row=document.createElement('div');row.className='row rate-row';const label=document.createElement('label');label.htmlFor='rate'+c;label.textContent='1 USD = '+c;const input=document.createElement('input');input.id='rate'+c;input.className='rate-input';input.inputMode='decimal';input.placeholder='—';row.append(label,input);$('rates').append(row);rateInputs[c]=input;input.addEventListener('input',()=>{manual.add(c);versions[c]++;schedule();rateStatus()})}
+function build(){packNodes.length=0;planNodes.length=0;const pf=document.createDocumentFragment();for(const p of PACKS){const b=document.createElement('button');b.className='pack';b.dataset.id=p.id;b.innerHTML='<span class="info"><span class="name"></span><span class="price"></span><span class="bonus"></span><span class="rate"></span></span><span class="badge"></span>';b.querySelector('.name').textContent=num(p.robux,0)+' Robux';b.querySelector('.bonus').textContent=t(15).replace(/^[^:]+: /,'')+': '+num(p.robux*1.25,0)+' Robux (+'+num(p.robux*.25,0)+')';pf.append(b);packNodes.push({p,b,price:b.querySelector('.price'),rate:b.querySelector('.rate'),badge:b.querySelector('.badge')})}$('packs').replaceChildren(pf);const fragment=document.createDocumentFragment();for(const p of PLUS){const card=document.createElement('article');card.className='plan';card.innerHTML='<h3></h3><div class="plan-price"></div><div class="price"></div><p class="note"></p><button class="action wide"></button>';card.querySelector('h3').textContent=p.name;card.querySelector('.plan-price').textContent=usd(p.cents/100)+' '+t(23);card.querySelector('.note').textContent=p.robux?num(p.robux,0)+' Robux '+t(23):t(24);const button=card.querySelector('button');button.dataset.id=p.id;fragment.append(card);planNodes.push({p,card,button,price:card.querySelector('.price')})}$('plans').replaceChildren(fragment)}
+function purchase(id,item,amount,rate,subscription){const box=$(id);box.hidden=!item;if(!item)return;if(!box.firstElementChild)box.innerHTML='<h3></h3><div class="row"><span>Robux</span><strong class="item"></strong></div><div class="row"><span class="cost-label"></span><strong class="cost"></strong></div><div class="remaining"><span class="label"></span><div class="value"></div><div class="note"></div></div>';setText(box.querySelector('h3'),t(7));setText(box.querySelector('.item'),subscription?item.name:num(item.robux*($('bonus').checked?1.25:1),0)+' Robux');setText(box.querySelector('.cost-label'),t(9));setText(box.querySelector('.cost'),usd(item.cents/100)+' · ≈ '+local(item.cents/100*rate));setText(box.querySelector('.label'),t(subscription?27:10));setText(box.querySelector('.value'),'≈ '+local(Math.max(0,amount-item.cents/100*rate)));setText(box.querySelector('.note'),'≈ '+usd(Math.max(0,amount/rate-item.cents/100)))}
+function calculate(){const amount=decimal($('amount').value,true),rate=decimal(rateInputs[currency].value),valid=Number.isFinite(amount)&&amount>=0&&Number.isFinite(rate)&&rate>0&&Number.isFinite(amount/rate),budget=valid?amount/rate:NaN,cents=valid?Math.floor(budget*100+1e-7):-1,mult=$('bonus').checked?1.25:1;let best=null;for(const p of PACKS)if(p.cents<=cents&&(!best||p.robux*best.cents>best.robux*p.cents))best=p;const chosen=PACKS.find(p=>p.id===selectedPack&&p.cents<=cents)||best,plan=PLUS.find(p=>p.id===selectedPlus&&p.cents<=cents);setText($('usd'),valid?usd(budget):'—');setText($('best'),best?num(best.robux*mult,0)+' R$':'—');setText($('status'),!valid?t(17):amount>0&&!best?t(8):'');for(const n of packNodes){const available=n.p.cents<=cents,selected=n.p===chosen;n.b.disabled=!available;n.b.classList.toggle('best',n.p===best);n.b.classList.toggle('selected',selected);n.b.setAttribute('aria-pressed',String(selected));setText(n.price,usd(n.p.cents/100)+(rate>0&&Number.isFinite(rate)?' · ≈ '+local(n.p.cents/100*rate):''));setText(n.rate,num(n.p.robux*mult*100/n.p.cents,1)+' '+t(19));setText(n.badge,!available?t(8):selected?t(7):n.p===best?t(4):t(26))}for(const n of planNodes){n.button.disabled=n.p.cents>cents;n.card.classList.toggle('selected',n.p===plan);n.button.setAttribute('aria-pressed',String(n.p===plan));setText(n.button,n.button.disabled?t(8):n.p===plan?t(7):t(6));setText(n.price,rate>0&&Number.isFinite(rate)?'≈ '+local(n.p.cents/100*rate)+' '+t(23):'—')}purchase('packPurchase',chosen,amount,rate,false);purchase('plusPurchase',plan,amount,rate,true)}
+function appearance(){document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]').content=theme==='glass'?'#0b0d12':'#000000';for(const b of $('themes').children){const yes=b.dataset.theme===theme;b.classList.toggle('active',yes);b.setAttribute('aria-pressed',String(yes))}for(const b of $('currencies').children){const yes=b.dataset.code===currency;b.classList.toggle('active',yes);b.setAttribute('aria-pressed',String(yes))}$('symbol').textContent={BYN:'Br',RUB:'₽',UAH:'₴'}[currency]}
+function rateStatus(){const messages=[];if(loading)messages.push(t(13));if(failed)messages.push(t(14));if(manual.has(currency))messages.push(t(29));else if(sourceTime)messages.push(t(cached?28:27)+' '+new Date(sourceTime).toLocaleString(lang));else if(!loading&&!failed)messages.push(t(14));setText($('apiStatus'),messages.join(' · '));$('refresh').disabled=loading}
+function clock(){const now=new Date();try{const parts={};for(const p of clockFormat.formatToParts(now))parts[p.type]=p.value;$('clock').textContent=parts.day+':'+parts.month+':'+parts.year+' '+parts.hour+':'+parts.minute+':'+parts.second;$('clock').dateTime=now.toISOString()}catch{$('clock').textContent='—'}}
+function startClock(){clearInterval(clockTimer);if(document.hidden)return;clock();clockTimer=setInterval(clock,1000)}
+function language(){document.documentElement.lang=lang;$('language').value=lang;formats.clear();for(const el of document.querySelectorAll('[data-t]'))el.textContent=t(Number(el.dataset.t));const cities={ru:['Europe/Moscow','Москва'],en:['America/New_York','Washington, D.C.'],uk:['Europe/Kyiv','Київ'],be:['Europe/Minsk','Мінск']};const [zone,city]=cities[lang];$('city').textContent=city;const options={timeZone:zone,day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23',numberingSystem:'latn'};try{clockFormat=new Intl.DateTimeFormat('en-GB',options)}catch{if(lang==='uk')options.timeZone='Europe/Kiev';try{clockFormat=new Intl.DateTimeFormat('en-GB',options)}catch{clockFormat=null}}$('rateHint').textContent={ru:'Курс — количество местной валюты за 1 USD. Можно ввести курс банка. Обновление заменит ручные значения.',en:'Local currency units per 1 USD. Enter your bank rate if needed. Refresh replaces manual rates.',uk:'Кількість місцевої валюти за 1 USD. Можна ввести курс банку. Оновлення замінить ручні значення.',be:'Колькасць мясцовай валюты за 1 USD. Можна ўвесці курс банка. Абнаўленне заменіць ручныя значэнні.'}[lang];build();calculate();rateStatus();startClock()}
+async function loadRates(force=false){if(loading)return;loading=true;failed=false;rateStatus();const snapshot={...versions},controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);try{const response=await fetch('https://open.er-api.com/v6/latest/USD',{signal:controller.signal});if(!response.ok)throw Error();const data=await response.json();if(data.result!=='success'||data.base_code!=='USD'||!data.rates||!CODES.every(c=>Number.isFinite(data.rates[c])&&data.rates[c]>0)||!Number.isFinite(data.time_last_update_unix)||data.time_last_update_unix<=0)throw Error();const rates={};for(const c of CODES){rates[c]=data.rates[c];if(versions[c]===snapshot[c]&&(force||!manual.has(c))){rateInputs[c].value=rates[c];manual.delete(c)}}sourceTime=data.time_last_update_unix*1000;cached=false;write(CACHE,{rates,timestamp:sourceTime,fetchedAt:Date.now()})}catch{failed=true}finally{clearTimeout(timer);loading=false;rateStatus();calculate();save()}}
+$('amount').value=typeof saved.amount==='string'?saved.amount:'';$('bonus').checked=saved.bonus===true;
+const cache=read(CACHE);if(cache&&cache.rates&&Number.isFinite(cache.timestamp)&&cache.timestamp>0&&CODES.every(c=>Number.isFinite(cache.rates[c])&&cache.rates[c]>0)){for(const c of CODES)rateInputs[c].value=cache.rates[c];sourceTime=cache.timestamp;cached=true}
+for(const c of CODES)if(saved.manualRates&&typeof saved.manualRates[c]==='string'){rateInputs[c].value=saved.manualRates[c];manual.add(c)}
+$('amount').addEventListener('input',schedule);$('bonus').addEventListener('change',()=>{calculate();save()});$('calculate').addEventListener('click',()=>{calculate();save()});$('themes').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;theme=b.dataset.theme;appearance();save()});$('currencies').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;currency=b.dataset.code;selectedPack=selectedPlus=null;appearance();calculate();rateStatus();save()});$('language').addEventListener('change',()=>{lang=$('language').value;language();save()});$('packs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;selectedPack=b.dataset.id;calculate();save()});$('plans').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;selectedPlus=b.dataset.id;calculate();save()});$('refresh').addEventListener('click',()=>loadRates(true));
+function slide(d){const track=$('plans'),first=track.firstElementChild;if(first)track.scrollBy({left:d*(first.getBoundingClientRect().width+12),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}
+$('prev').addEventListener('click',()=>slide(-1));$('next').addEventListener('click',()=>slide(1));
+document.addEventListener('visibilitychange',()=>{startClock();if(document.hidden)save()});
+window.addEventListener('pagehide',save);
+appearance();language();
+if(!cached||!Number.isFinite(cache.fetchedAt)||Date.now()-cache.fetchedAt>=TTL||cache.fetchedAt>Date.now())loadRates();
+setTimeout(()=>$('splash').classList.add('done'),900);
+})();</script>
 </body>
 </html>
